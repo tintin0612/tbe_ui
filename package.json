@@ -1,6 +1,6 @@
 {
   "name": "tbe-ui",
-  "version": "1.0.9",
+  "version": "1.1.2",
   "description": "Tbe UI - 一套有温度的UI组件库，包含60+精美组件，硅胶质感设计",
   "main": "dist/js/tbeui.js",
   "module": "dist/js/tbeui.js",
