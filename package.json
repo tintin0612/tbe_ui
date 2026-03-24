@@ -1,0 +1,79 @@
+{
+  "name": "tbe-ui",
+  "version": "1.0.5",
+  "description": "Tbe UI - 一套有温度的UI组件库，包含60+精美组件，硅胶质感设计",
+  "main": "dist/tbeui.cjs.js",
+  "module": "dist/tbeui.esm.js",
+  "style": "dist/tbeui.css",
+  "files": [
+    "dist",
+    "docs/src/adapters",
+    "docs/src/components",
+    "docs/src/core",
+    "docs/src/css",
+    "docs/src/js",
+    "docs/src/platforms",
+    "docs/src/types",
+    "docs/src/tbeui.css",
+    "README.md",
+    "LICENSE",
+    "wechat.jpg"
+  ],
+  "scripts": {
+    "build": "npm run build:lib",
+    "build:lib": "vite build",
+    "build:docs": "vitepress build docs && node scripts/copy-docs-assets.js",
+    "dev": "vite",
+    "dev:docs": "vitepress dev docs",
+    "lint": "npm run lint:js && npm run lint:css",
+    "lint:js": "eslint src/js",
+    "lint:css": "stylelint src/**/*.css",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "tbeui",
+    "ting",
+    "ui",
+    "css",
+    "components",
+    "framework",
+    "design-system",
+    "silicone",
+    "soft-ui",
+    "新拟态",
+    "组件库"
+  ],
+  "author": "Tbe UI Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tintin0612/tbe_ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tintin0612/tbe_ui/issues"
+  },
+  "homepage": "https://ui.bitehe.com",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jsdom": "^29.0.1",
+    "prettier": "^2.8.8",
+    "stylelint": "^15.8.0",
+    "stylelint-config-standard": "^34.0.0",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.7",
+    "vitepress": "^1.6.4",
+    "vitest": "^0.32.2"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}
