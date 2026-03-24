@@ -37,8 +37,8 @@ npm install tbe-ui
 <!-- 引入样式 (压缩版，推荐生产环境使用) -->
 <link rel="stylesheet" href="node_modules/tbe-ui/dist/css/tbeui.css">
 
-<!-- 引入 JavaScript (UMD格式，浏览器使用) -->
-<script src="node_modules/tbe-ui/dist/js/tbeui.umd.js"></script>
+<!-- 引入 JavaScript -->
+<script src="node_modules/tbe-ui/dist/js/tbeui.js"></script>
 <script>
   // 初始化组件
   TbeUI.init();
@@ -53,10 +53,8 @@ dist/
 │   ├── tbeui.css          # 压缩版（推荐生产环境）
 │   └── tbeui.full.css     # 完整版（便于调试）
 └── js/
-    ├── tbeui.js           # ESM格式 - 压缩版
-    ├── tbeui.full.js      # ESM格式 - 完整版
-    ├── tbeui.umd.js       # UMD格式 - 压缩版（浏览器推荐）
-    └── tbeui.umd.full.js  # UMD格式 - 完整版
+    ├── tbeui.js           # JS格式 - 压缩版
+    └── tbeui.full.js      # JS格式 - 完整版
 ```
 
 ### 🎯 使用组件

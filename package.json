@@ -7,14 +7,6 @@
   "style": "dist/css/tbeui.css",
   "files": [
     "dist",
-    "docs/src/adapters",
-    "docs/src/components",
-    "docs/src/core",
-    "docs/src/css",
-    "docs/src/js",
-    "docs/src/platforms",
-    "docs/src/types",
-    "docs/src/tbeui.css",
     "README.md",
     "LICENSE",
     "wechat.jpg"
