@@ -1,0 +1,124 @@
+/**
+ * Tbe UI - 硅胶质感 CSS 框架
+ * 版本: 1.1.0
+ * 作者: TingTing
+ * 说明: 基础变量定义
+ */
+
+/* ==================== 基础变量 ==================== */
+:root {
+    /* 基础颜色 - 可通过覆盖这些变量来自定义主题 */
+    --t-bg: #e3e5e7;
+    --t-shadow-dark: #b6b9ba;
+    --t-shadow-light: #fafafd;
+    
+    /* 背景色变体 */
+    --t-bg-light: #e3e5e7;
+    --t-bg-dark: #2d2d2d;
+    --t-bg-warm: #f5f0e8;
+    --t-bg-cool: #e8f0f5;
+    
+    /* 文字颜色 */
+    --t-text-primary: #303133;
+    --t-text-regular: #606266;
+    --t-text-secondary: #909399;
+    --t-text-placeholder: #a8abb2;
+    
+    /* 主题色 */
+    --t-primary: #409eff;
+    --t-primary-light: #66b1ff;
+    --t-primary-dark: #3a8ee6;
+    --t-success: #67c23a;
+    --t-success-light: #85ce61;
+    --t-warning: #e6a23c;
+    --t-warning-light: #ebb563;
+    --t-warning-active: #f7ba2a;
+    --t-danger: #f56c6c;
+    --t-danger-light: #f78989;
+    --t-info: #909399;
+    --t-info-light: #a6a9ad;
+    
+    /* 圆角 */
+    --t-radius-sm: 8px;
+    --t-radius: 12px;
+    --t-radius-lg: 16px;
+    --t-radius-xl: 20px;
+    
+    /* 阴影强度 */
+    --t-shadow-sm: 2px 2px 4px var(--t-shadow-dark), -2px -2px 4px var(--t-shadow-light);
+    --t-shadow: 4px 4px 8px var(--t-shadow-dark), -4px -4px 8px var(--t-shadow-light);
+    --t-shadow-lg: 6px 6px 12px var(--t-shadow-dark), -6px -6px 12px var(--t-shadow-light);
+    --t-shadow-xl: 8px 8px 16px var(--t-shadow-dark), -8px -8px 16px var(--t-shadow-light);
+    
+    /* 内阴影 */
+    --t-inset-sm: inset 2px 2px 4px var(--t-shadow-dark), inset -2px -2px 4px var(--t-shadow-light);
+    --t-inset: inset 3px 3px 6px var(--t-shadow-dark), inset -3px -3px 6px var(--t-shadow-light);
+    --t-inset-lg: inset 4px 4px 8px var(--t-shadow-dark), inset -4px -4px 8px var(--t-shadow-light);
+    
+    /* 边框和分隔线阴影 */
+    --t-border-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    --t-inset-border-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.05);
+    --t-primary-glow-shadow: 5px 5px 10px rgba(64, 158, 255, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8);
+    --t-danger-glow-shadow: 5px 5px 10px rgba(245, 108, 108, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8);
+    
+    /* 对话框相关 */
+    --t-dialog-mask-bg: rgba(0, 0, 0, 0.5);
+    --t-dialog-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    
+    /* 其他颜色变量 */
+    --t-primary-hex: #409EFF;
+    --t-disabled-color: #C0C4CC;
+    --t-bg-disabled: #F5F7FA;
+    --t-border-color-light: rgba(0, 0, 0, 0.05);
+    --t-white: #fff;
+    --t-white-rgba-10: rgba(255, 255, 255, 0.1);
+    --t-white-rgba-20: rgba(255, 255, 255, 0.2);
+    --t-white-rgba-30: rgba(255, 255, 255, 0.3);
+    --t-white-rgba-50: rgba(255, 255, 255, 0.5);
+    --t-white-rgba-70: rgba(255, 255, 255, 0.7);
+    --t-white-rgba-80: rgba(255, 255, 255, 0.8);
+    --t-white-rgba-90: rgba(255, 255, 255, 0.9);
+    --t-white-rgba-95: rgba(255, 255, 255, 0.95);
+    --t-black-rgba-2: rgba(0, 0, 0, 0.02);
+    --t-black-rgba-5: rgba(0, 0, 0, 0.05);
+    --t-black-rgba-10: rgba(0, 0, 0, 0.1);
+    --t-black-rgba-12: rgba(0, 0, 0, 0.12);
+    --t-black-rgba-15: rgba(0, 0, 0, 0.15);
+    --t-black-rgba-20: rgba(0, 0, 0, 0.2);
+    --t-black-rgba-30: rgba(0, 0, 0, 0.3);
+    --t-black-rgba-40: rgba(0, 0, 0, 0.4);
+    --t-black-rgba-50: rgba(0, 0, 0, 0.5);
+    --t-black-rgba-60: rgba(0, 0, 0, 0.6);
+    --t-black-rgba-85: rgba(0, 0, 0, 0.85);
+    --t-black-rgba-90: rgba(0, 0, 0, 0.9);
+    --t-primary-rgba-5: rgba(64, 158, 255, 0.05);
+    --t-primary-rgba-8: rgba(64, 158, 255, 0.08);
+    --t-primary-rgba-10: rgba(64, 158, 255, 0.1);
+    --t-primary-rgba-20: rgba(64, 158, 255, 0.2);
+    --t-success-rgba-10: rgba(103, 194, 58, 0.1);
+    --t-success-rgba-20: rgba(103, 194, 58, 0.2);
+    --t-warning-rgba-10: rgba(230, 162, 60, 0.1);
+    --t-warning-rgba-20: rgba(230, 162, 60, 0.2);
+    --t-danger-rgba-10: rgba(245, 108, 108, 0.1);
+    --t-danger-rgba-20: rgba(245, 108, 108, 0.2);
+    --t-info-rgba-10: rgba(144, 147, 153, 0.1);
+    --t-info-rgba-20: rgba(144, 147, 153, 0.2);
+    
+    /* 内阴影变体 */
+    --t-inset-shadow-sm: inset 2px 2px 4px rgba(0, 0, 0, 0.15), inset -2px -2px 4px rgba(255, 255, 255, 0.8);
+    --t-inset-shadow-md: inset 3px 3px 6px rgba(0, 0, 0, 0.15), inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+    --t-inset-shadow-lg: inset 4px 4px 8px rgba(0, 0, 0, 0.12), inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+    --t-inset-shadow-xl: inset 5px 5px 10px rgba(0, 0, 0, 0.15), inset -5px -5px 10px rgba(255, 255, 255, 0.95);
+    --t-inset-shadow-button: inset 2px 2px 5px rgba(0, 0, 0, 0.2), inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+    
+    /* 过渡 */
+    --t-transition: all 0.3s ease;
+    
+    /* 响应式断点变量 - 与 Bootstrap 5 对齐 */
+    --t-breakpoint-xs: 0;
+    --t-breakpoint-sm: 576px;
+    --t-breakpoint-md: 768px;
+    --t-breakpoint-lg: 992px;
+    --t-breakpoint-xl: 1200px;
+    --t-breakpoint-xxl: 1400px;
+}
