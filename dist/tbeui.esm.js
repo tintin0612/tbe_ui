@@ -1,0 +1,6063 @@
+var qe = (D, S) => () => (S || D((S = { exports: {} }).exports, S), S.exports);
+var $e = qe((Ee, le) => {
+  (function(D, S) {
+    typeof Ee == "object" && typeof le < "u" ? le.exports = S() : typeof define == "function" && define.amd ? define(S) : (D = typeof globalThis < "u" ? globalThis : D || self, D.TbeUI = S());
+  })(globalThis, function() {
+    function D(e, t) {
+      let s = null;
+      return function(...n) {
+        s && clearTimeout(s), s = setTimeout(() => {
+          e.apply(this, n);
+        }, t);
+      };
+    }
+    function S(e, t) {
+      let s = 0;
+      return function(...n) {
+        const i = Date.now();
+        i - s >= t && (s = i, e.apply(this, n));
+      };
+    }
+    function Se(e) {
+      const t = e.getBoundingClientRect();
+      return t.top >= 0 && t.left >= 0 && t.bottom <= (window.innerHeight || document.documentElement.clientHeight) && t.right <= (window.innerWidth || document.documentElement.clientWidth);
+    }
+    function Le(e = "🎨 Tbe UI 已加载", t = "https://ui.bitehe.com", s = "#dc6b82") {
+      console.log(
+        `%c ${e} %c ${t}`,
+        `color:white;background:${s};padding:5px 0;border-radius: 5px 0 0 5px;`,
+        `padding:4px;border:1px solid ${s};border-radius: 0 5px 5px 0;`
+      );
+    }
+    function _e() {
+      console.log(`%c
+    ╔═════════╗
+            Tbe UI  
+    ╚═════════╝
+    `, "color: #dc6b82");
+    }
+    const ee = {
+      /**
+       * 选择 Radio Button 样式（兼容旧版调用方式）
+       * @param {HTMLElement} button - 按钮元素
+       * @param {string} groupName - 组名
+       */
+      selectRadioButton(e, t) {
+        this.selectButton(e, t);
+      },
+      /**
+       * 选择 Radio Button 样式
+       * @param {HTMLElement} button - 按钮元素
+       * @param {string} groupName - 组名
+       */
+      selectButton(e, t) {
+        e.parentElement.querySelectorAll(".t-radio-button").forEach((i) => {
+          i.classList.remove("is-active"), i.setAttribute("aria-checked", "false");
+        }), e.classList.add("is-active"), e.setAttribute("aria-checked", "true"), e.dispatchEvent(new CustomEvent("t:radio:change", {
+          detail: { value: e.dataset.value, group: t }
+        }));
+      },
+      /**
+       * 更新 Radio 选中状态
+       * @param {HTMLInputElement} radio - radio输入元素
+       */
+      updateCheckedState(e) {
+        const t = e.closest(".t-radio");
+        if (t) {
+          const s = e.checked;
+          t.classList.toggle("is-checked", s), t.setAttribute("aria-checked", s.toString()), s && e.name && document.querySelectorAll(`input[name="${e.name}"]`).forEach((n) => {
+            if (n !== e) {
+              const i = n.closest(".t-radio");
+              i && (i.classList.remove("is-checked"), i.setAttribute("aria-checked", "false"));
+            }
+          });
+        }
+      },
+      /**
+       * 初始化所有 Radio 组件
+       */
+      init() {
+        document.querySelectorAll(".t-radio__input").forEach((e) => {
+          this.updateCheckedState(e), e.addEventListener("change", () => {
+            e.name ? document.querySelectorAll(`input[name="${e.name}"]`).forEach((t) => {
+              this.updateCheckedState(t);
+            }) : this.updateCheckedState(e);
+          });
+        });
+      }
+    }, U = {
+      /**
+       * 更新 Checkbox 选中状态
+       * @param {HTMLInputElement} checkbox - checkbox输入元素
+       */
+      updateCheckedState(e) {
+        const t = e.closest(".t-checkbox");
+        if (t && !t.classList.contains("is-disabled")) {
+          const s = e.checked;
+          t.classList.toggle("is-checked", s), t.setAttribute("aria-checked", s.toString());
+        }
+      },
+      /**
+       * 切换 Checkbox Button 状态（兼容旧版调用方式）
+       * @param {HTMLElement} button - 按钮元素
+       */
+      toggleCheckboxButton(e) {
+        this.toggleButton(e);
+      },
+      /**
+       * 切换 Checkbox Button 状态
+       * @param {HTMLElement} button - 按钮元素
+       */
+      toggleButton(e) {
+        if (e.classList.contains("is-disabled"))
+          return;
+        const t = e.classList.toggle("is-active");
+        e.setAttribute("aria-pressed", t.toString());
+      },
+      /**
+       * 切换全选状态（兼容旧版调用方式 - checkbox-cities-group）
+       */
+      toggleCheckAll() {
+        const e = document.getElementById("checkbox-all-input"), t = document.querySelectorAll(".city-checkbox");
+        if (e && t.length > 0) {
+          const n = e.checked;
+          t.forEach((i) => {
+            i.checked = !n, this.updateCheckedState(i);
+          }), e.checked = !n, this.updateCheckedState(e);
+          return;
+        }
+        const s = document.querySelector(".t-checkbox.is-indeterminate, .t-checkbox[data-check-all]");
+        if (s) {
+          const n = s.closest(".t-checkbox-group");
+          n && this.toggleCheckAllBySelector("#" + n.id);
+        }
+      },
+      /**
+       * 切换全选状态（通过选择器）
+       * @param {string} groupSelector - 分组选择器
+       */
+      toggleCheckAllBySelector(e) {
+        const t = document.querySelector(`${e} .t-checkbox.is-indeterminate, ${e} [data-check-all]`);
+        if (!t)
+          return;
+        const s = t.querySelector('input[type="checkbox"]'), n = document.querySelectorAll(`${e} .t-checkbox:not([data-check-all]) input[type="checkbox"]`);
+        t.classList.contains("is-indeterminate") && t.classList.remove("is-indeterminate"), s.checked = !s.checked, n.forEach((i) => {
+          i.checked = s.checked, this.updateCheckedState(i);
+        }), this.updateCheckedState(s);
+      },
+      /**
+       * 更新全选状态
+       * @param {string} groupSelector - 分组选择器
+       */
+      updateCheckAllState(e) {
+        const t = document.querySelector(`${e} [data-check-all]`);
+        if (!t)
+          return;
+        const s = t.querySelector('input[type="checkbox"]'), n = document.querySelectorAll(`${e} .t-checkbox:not([data-check-all]) input[type="checkbox"]`), i = Array.from(n).filter((o) => o.checked).length, a = n.length;
+        t.classList.remove("is-indeterminate"), i === 0 ? s.checked = !1 : i === a ? s.checked = !0 : (s.checked = !1, t.classList.add("is-indeterminate")), this.updateCheckedState(s);
+      },
+      /**
+       * 初始化所有 Checkbox 组件
+       */
+      init() {
+        document.querySelectorAll(".t-checkbox__input").forEach((e) => {
+          this.updateCheckedState(e), e.addEventListener("change", () => {
+            this.updateCheckedState(e);
+            const t = e.closest("[data-checkbox-group]");
+            t && this.updateCheckAllState(`[data-checkbox-group="${t.dataset.checkboxGroup}"]`);
+          });
+        });
+      }
+    }, H = {
+      /**
+       * 清空输入框（兼容旧版调用方式）
+       * @param {string} inputId - 输入框ID
+       */
+      clearInput(e) {
+        this.clear(e);
+      },
+      /**
+       * 清空输入框
+       * @param {string} inputId - 输入框ID
+       */
+      clear(e) {
+        const t = document.getElementById(e);
+        t && (t.value = "", t.focus(), t.dispatchEvent(new Event("input", { bubbles: !0 })));
+      },
+      /**
+       * 切换密码显示/隐藏
+       * @param {string} inputId - 输入框ID
+       * @param {HTMLElement} icon - 图标元素
+       */
+      togglePassword(e, t) {
+        const s = document.getElementById(e);
+        if (s) {
+          const n = s.type === "password";
+          s.type = n ? "text" : "password", t && (t.textContent = n ? "🙈" : "👁", t.setAttribute("aria-label", n ? "隐藏密码" : "显示密码"));
+        }
+      },
+      /**
+       * 文本域自适应高度
+       * @param {HTMLTextAreaElement} textarea - 文本域元素
+       */
+      autoResize(e) {
+        e.style.height = "auto", e.style.height = e.scrollHeight + "px";
+      },
+      /**
+       * 更新字数统计
+       * @param {HTMLTextAreaElement} textarea - 文本域元素
+       * @param {string} countId - 计数元素ID
+       */
+      updateCharCount(e, t) {
+        const s = e.value.length, n = e.getAttribute("maxlength"), i = document.getElementById(t);
+        i && (i.textContent = `${s}/${n}`, i.setAttribute("aria-live", "polite"));
+      }
+    }, Y = {
+      /**
+       * 改变数值（兼容旧版调用方式）
+       * @param {string} inputId - 输入框ID
+       * @param {number} delta - 变化量
+       */
+      changeNumber(e, t) {
+        this.change(e, t);
+      },
+      /**
+       * 改变数值（带步长，兼容旧版调用方式）
+       * @param {string} inputId - 输入框ID
+       * @param {number} delta - 变化量
+       * @param {number} step - 步长
+       */
+      changeNumberStep(e, t, s) {
+        const n = document.getElementById(e);
+        n && (n.step = s), this.change(e, t);
+      },
+      /**
+       * 改变数值（严格步数模式，兼容旧版调用方式）
+       * @param {string} inputId - 输入框ID
+       * @param {number} delta - 变化量
+       * @param {number} step - 步长
+       */
+      changeNumberStrict(e, t, s) {
+        const n = document.getElementById(e);
+        n && (n.step = s), this.change(e, t, { strict: !0 });
+      },
+      /**
+       * 改变数值
+       * @param {string} inputId - 输入框ID
+       * @param {number} delta - 变化量
+       * @param {Object} options - 配置选项
+       */
+      change(e, t, s = {}) {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        let i = parseFloat(n.value) || 0;
+        const a = parseFloat(n.min), o = parseFloat(n.max), l = parseFloat(n.step) || 1;
+        i += t * l, !isNaN(a) && i < a && (i = a), !isNaN(o) && i > o && (i = o), s.strict && i % l !== 0 && (i = Math.round(i / l) * l), n.value = i, n.dispatchEvent(new Event("input", { bubbles: !0 })), n.dispatchEvent(new Event("change", { bubbles: !0 }));
+      }
+    }, V = {
+      /**
+       * 切换下拉菜单（兼容旧版调用方式）
+       * @param {string} selectId - 选择器ID
+       */
+      toggleSelect(e) {
+        this.toggle(e);
+      },
+      /**
+       * 清空选择器（兼容旧版调用方式）
+       * @param {string} selectId - 选择器ID
+       * @param {Event} event - 事件对象
+       */
+      clearSelect(e, t) {
+        t && t.stopPropagation();
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-select__input");
+        n && (n.value = "", n.removeAttribute("data-value")), s.querySelectorAll(".t-select__option").forEach((i) => {
+          i.classList.remove("is-selected"), i.setAttribute("aria-selected", "false");
+        }), s.dispatchEvent(new CustomEvent("t:select:clear"));
+      },
+      /**
+       * 切换下拉菜单
+       * @param {string} selectId - 选择器ID
+       */
+      toggle(e) {
+        const t = document.getElementById(e);
+        if (!t || t.classList.contains("is-disabled"))
+          return;
+        const s = t.classList.contains("is-open");
+        document.querySelectorAll(".t-select.is-open").forEach((n) => {
+          n.id !== e && (n.classList.remove("is-open"), n.setAttribute("aria-expanded", "false"));
+        }), t.classList.toggle("is-open"), t.setAttribute("aria-expanded", (!s).toString()), s || setTimeout(() => {
+          const n = (i) => {
+            t.contains(i.target) || (t.classList.remove("is-open"), t.setAttribute("aria-expanded", "false"), document.removeEventListener("click", n));
+          };
+          document.addEventListener("click", n);
+        }, 0);
+      },
+      /**
+       * 选择选项
+       * @param {string} selectId - 选择器ID
+       * @param {string} value - 选项值
+       * @param {string} label - 选项标签（可选）
+       */
+      selectOption(e, t, s) {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        const i = n.querySelector(".t-select__input"), a = s || t;
+        i && (i.value = a, i.setAttribute("data-value", t)), n.querySelectorAll(".t-select__option").forEach((o) => {
+          const l = o.dataset.value === t || o.textContent === a;
+          o.classList.toggle("is-selected", l), o.setAttribute("aria-selected", l.toString());
+        }), n.classList.remove("is-open"), n.setAttribute("aria-expanded", "false"), n.dispatchEvent(new CustomEvent("t:select:change", {
+          detail: { value: t, label: a }
+        }));
+      }
+    }, ce = {
+      /**
+       * 切换下拉菜单
+       * @param {string} dropdownId - 下拉菜单ID
+       */
+      toggle(e) {
+        const t = document.getElementById(e);
+        if (t) {
+          const s = t.classList.toggle("is-active");
+          t.setAttribute("aria-expanded", s.toString());
+        }
+      },
+      /**
+       * 选择下拉项
+       * @param {HTMLElement} item - 选项元素
+       * @param {string} value - 选项值
+       */
+      selectItem(e, t) {
+        const s = e.closest(".t-dropdown");
+        s && (s.classList.remove("is-active"), s.setAttribute("aria-expanded", "false")), te.success("选择了：" + t), s && s.dispatchEvent(new CustomEvent("t:dropdown:select", {
+          detail: { value: t }
+        }));
+      },
+      /**
+       * 初始化 - 点击外部关闭
+       */
+      init() {
+        document.addEventListener("click", (e) => {
+          document.querySelectorAll(".t-dropdown.is-active").forEach((t) => {
+            t.contains(e.target) || (t.classList.remove("is-active"), t.setAttribute("aria-expanded", "false"));
+          });
+        });
+      }
+    }, B = {
+      stack: [],
+      dragState: {},
+      /**
+       * 打开对话框
+       * @param {string} dialogId - 对话框ID
+       * @param {Object} options - 配置选项
+       */
+      open(e, t = {}) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        s.style.display = "flex", s.setAttribute("aria-hidden", "false"), this.stack.length === 0 && (document.body.style.overflow = "hidden"), this.stack.push(e);
+        const n = s.querySelector(".t-dialog--draggable");
+        n && this.initDraggable(n);
+        const i = s.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        i && i.focus(), s.dispatchEvent(new CustomEvent("t:dialog:open", {
+          detail: { dialogId: e, options: t }
+        }));
+      },
+      /**
+       * 初始化拖拽功能
+       * @param {HTMLElement} dialog - 对话框元素
+       */
+      initDraggable(e) {
+        const t = e.querySelector(".t-dialog__header");
+        !t || e.dataset.draggableInit || (e.dataset.draggableInit = "true", t.style.cursor = "move", t.addEventListener("mousedown", (s) => {
+          if (s.button !== 0)
+            return;
+          const n = e.getBoundingClientRect();
+          this.dragState = {
+            isDragging: !0,
+            startX: s.clientX,
+            startY: s.clientY,
+            originalLeft: n.left,
+            originalTop: n.top
+          }, document.addEventListener("mousemove", this.handleDragMove), document.addEventListener("mouseup", this.handleDragEnd), s.preventDefault();
+        }));
+      },
+      /**
+       * 处理拖拽移动
+       */
+      handleDragMove: (e) => {
+        if (!B.dragState.isDragging)
+          return;
+        const { startX: t, startY: s, originalLeft: n, originalTop: i } = B.dragState, a = e.clientX - t, o = e.clientY - s;
+        document.querySelectorAll(".t-dialog--draggable").forEach((c) => {
+          c.style.display !== "none" && (c.style.position = "fixed", c.style.left = n + a + "px", c.style.top = i + o + "px", c.style.margin = "0");
+        });
+      },
+      /**
+       * 处理拖拽结束
+       */
+      handleDragEnd: () => {
+        B.dragState = {}, document.removeEventListener("mousemove", B.handleDragMove), document.removeEventListener("mouseup", B.handleDragEnd);
+      },
+      /**
+       * 关闭对话框
+       * @param {string} dialogId - 对话框ID
+       */
+      close(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        t.style.display = "none", t.setAttribute("aria-hidden", "true");
+        const s = this.stack.indexOf(e);
+        s > -1 && this.stack.splice(s, 1), this.stack.length === 0 && (document.body.style.overflow = ""), t.dispatchEvent(new CustomEvent("t:dialog:close", {
+          detail: { dialogId: e }
+        }));
+      },
+      /**
+       * 初始化 - ESC键关闭
+       */
+      init() {
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && this.stack.length > 0) {
+            const t = this.stack[this.stack.length - 1];
+            this.close(t);
+          }
+        });
+      }
+    }, q = {
+      stack: [],
+      open(e = "right", t = {}) {
+        const s = t.size || "300px";
+        let n = document.getElementById("t-drawer-" + e), i = document.getElementById("t-drawer-overlay-" + e);
+        if (!n) {
+          i = document.createElement("div"), i.className = "t-drawer-overlay", i.id = "t-drawer-overlay-" + e, n = document.createElement("div"), n.className = "t-drawer t-drawer-" + e, n.id = "t-drawer-" + e;
+          const a = {
+            right: "translateX(-100%)",
+            left: "translateX(100%)",
+            top: "translateY(100%)",
+            bottom: "translateY(-100%)"
+          };
+          n.style.cssText = `
+                    width: ${e === "right" || e === "left" ? s : "100%"};
+                    height: ${e === "top" || e === "bottom" ? s : "100%"};
+                    transform: ${a[e]};
+                    transition: transform 0.3s ease;
+                `, n.innerHTML = `
+                    <div class="t-drawer-header">
+                        <span class="t-drawer-title">${t.title || "标题"}</span>
+                        <button class="t-drawer-close" onclick="Drawer.close('${e}')">×</button>
+                    </div>
+                    <div class="t-drawer-body">
+                        ${t.content || "抽屉内容"}
+                    </div>
+                    ${t.showFooter ? '<div class="t-drawer-footer">' + (t.footer || "") + "</div>" : ""}
+                `, i.appendChild(n), document.body.appendChild(i), i.addEventListener("click", (o) => {
+            o.target === i && this.close(e);
+          });
+        }
+        setTimeout(() => {
+          n.style.transform = "translateX(0) translateY(0)", i && i.classList.add("active");
+        }, 10), this.stack.push(e);
+      },
+      close(e = "right") {
+        const t = document.getElementById("t-drawer-" + e), s = document.getElementById("t-drawer-overlay-" + e);
+        if (t) {
+          const i = {
+            right: "translateX(-100%)",
+            left: "translateX(100%)",
+            top: "translateY(100%)",
+            bottom: "translateY(-100%)"
+          };
+          t.style.transform = i[e];
+        }
+        s && s.classList.remove("active");
+        const n = this.stack.indexOf(e);
+        n > -1 && this.stack.splice(n, 1), setTimeout(() => {
+          s && !s.classList.contains("active") && s.remove();
+        }, 300);
+      }
+    }, L = {
+      stack: [],
+      defaultOptions: {
+        type: "info",
+        title: "提示",
+        message: "",
+        showConfirmButton: !0,
+        showCancelButton: !1,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        closeOnClickModal: !0,
+        closeOnPressEscape: !0,
+        showClose: !1,
+        center: !1,
+        closeOnClose: !1,
+        distbeuishCancelAndClose: !1,
+        inputPlaceholder: "",
+        inputPattern: null,
+        inputType: "text",
+        inputErrorMessage: "输入的数据不合法!",
+        showInput: !1,
+        customClass: "",
+        beforeClose: null,
+        callback: null
+      },
+      /**
+       * 显示消息框
+       * @param {string|Object} message - 消息内容或选项
+       * @param {string} title - 标题
+       * @param {Object} options - 配置选项
+       * @returns {Promise}
+       */
+      show(e, t, s = {}) {
+        const n = { ...this.defaultOptions };
+        return typeof e == "object" ? Object.assign(n, e) : (n.message = e, t && (n.title = t), Object.assign(n, s)), new Promise((i, a) => {
+          const o = document.getElementById("tMessageBoxOverlay"), l = document.getElementById("tMessageBox");
+          if (!o || !l)
+            return;
+          const c = document.getElementById("tMessageBoxTitle"), d = document.getElementById("tMessageBoxMessage"), m = document.getElementById("tMessageBoxIcon"), r = document.getElementById("tMessageBoxBtns");
+          document.getElementById("tMessageBoxConfirm"), document.getElementById("tMessageBoxCancel"), c.textContent = n.title, n.dangerouslyUseHTMLString ? d.innerHTML = n.message : d.textContent = n.message;
+          const h = {
+            success: "✓",
+            warning: "⚠",
+            error: "✕",
+            info: "ℹ"
+          };
+          if (m.textContent = h[n.type] || h.info, m.className = "t-message-box-icon", r.innerHTML = "", n.showCancelButton) {
+            const u = document.createElement("button");
+            u.className = "t-btn", u.textContent = n.cancelButtonText, u.onclick = () => this.closeAction("cancel", n, i, a), r.appendChild(u);
+          }
+          if (n.showConfirmButton) {
+            const u = document.createElement("button");
+            u.className = "t-btn t-btn-primary", u.textContent = n.confirmButtonText, u.onclick = () => this.closeAction("confirm", n, i, a), r.appendChild(u);
+          }
+          if (n.showClose) {
+            const u = document.getElementById("tMessageBoxClose");
+            u.style.display = "flex";
+          } else {
+            const u = document.getElementById("tMessageBoxClose");
+            u.style.display = "none";
+          }
+          o.classList.add("active"), l.className = "t-message-box t-message-box-" + n.type + (n.customClass ? " " + n.customClass : ""), n.center && l.classList.add("t-message-box--center"), this.stack.length === 0 && (document.body.style.overflow = "hidden"), this.stack.push({ resolve: i, reject: a, config: n });
+          const f = r.querySelector("button");
+          f && f.focus();
+        });
+      },
+      /**
+       * 执行关闭操作
+       */
+      closeAction(e, t, s, n) {
+        this.stack.pop() && (t.beforeClose ? t.beforeClose(e, this, () => {
+          this.doClose(t, e, s, n);
+        }) : this.doClose(t, e, s, n));
+      },
+      /**
+       * 执行实际关闭
+       */
+      doClose(e, t, s, n) {
+        var o;
+        document.getElementById("tMessageBoxOverlay").classList.remove("active");
+        const a = document.querySelector(".t-message-box-input");
+        if (a && a.remove(), this.stack.length === 0 && (document.body.style.overflow = ""), e.callback && e.callback(t), t === "confirm") {
+          const l = (o = document.getElementById("tMessageBoxInput")) == null ? void 0 : o.value;
+          s({ action: t, value: l });
+        } else
+          t === "cancel" && e.distbeuishCancelAndClose ? n({ action: t, value: void 0 }) : n({ action: t, value: void 0 });
+      },
+      /**
+       * 关闭消息框
+       * @param {string} action - 关闭动作
+       */
+      close(e = "close") {
+        var l;
+        if (this.stack.length === 0)
+          return;
+        const t = this.stack.pop();
+        if (!t)
+          return;
+        document.getElementById("tMessageBoxOverlay").classList.remove("active");
+        const n = document.querySelector(".t-message-box-input");
+        n && n.remove(), this.stack.length === 0 && (document.body.style.overflow = "");
+        const { config: i, resolve: a, reject: o } = t;
+        if (i.callback && i.callback(e), e === "confirm") {
+          const c = (l = document.getElementById("tMessageBoxInput")) == null ? void 0 : l.value;
+          a({ action: e, value: c });
+        } else
+          o({ action: e, value: void 0 });
+      },
+      /**
+       * Alert 消息提示
+       */
+      alert(e, t, s) {
+        const n = {
+          type: "info",
+          title: "提示",
+          message: e,
+          showConfirmButton: !0,
+          showCancelButton: !1,
+          showClose: !1
+        };
+        return typeof t == "object" ? (s = t, n.title = s.title || "提示") : t && (n.title = t), s && Object.assign(n, s), this.show(n);
+      },
+      /**
+       * Confirm 确认消息
+       */
+      confirm(e, t, s) {
+        const n = {
+          type: "warning",
+          title: "确认",
+          message: e,
+          showConfirmButton: !0,
+          showCancelButton: !0,
+          showClose: !1
+        };
+        return typeof t == "object" ? (s = t, n.title = s.title || "确认", n.type = s.type || "warning") : t && (n.title = t), s && Object.assign(n, s), this.show(n);
+      },
+      /**
+       * Prompt 输入框
+       */
+      prompt(e, t, s) {
+        const n = {
+          type: "info",
+          title: "输入",
+          message: e,
+          showConfirmButton: !0,
+          showCancelButton: !0,
+          showInput: !0,
+          showClose: !1
+        };
+        typeof t == "object" ? (s = t, n.title = s.title || "输入") : t && (n.title = t), s && Object.assign(n, s);
+        const i = this.show(n);
+        return setTimeout(() => {
+          const a = document.querySelector(".t-message-box-content"), o = document.querySelector(".t-message-box-input");
+          if (a && n.showInput && !o) {
+            const l = document.createElement("div");
+            l.className = "t-message-box-input", l.innerHTML = `
+                        <input type="${n.inputType || "text"}" id="tMessageBoxInput"
+                               class="t-input"
+                               placeholder="${n.inputPlaceholder || ""}"
+                               pattern="${n.inputPattern || ""}">
+                    `, a.appendChild(l);
+          }
+        }, 0), i;
+      },
+      /**
+       * 快捷方法 - 成功
+       */
+      success(e, t) {
+        return this.alert(e, t, { type: "success" });
+      },
+      /**
+       * 快捷方法 - 警告
+       */
+      warning(e, t) {
+        return this.alert(e, t, { type: "warning" });
+      },
+      /**
+       * 快捷方法 - 错误
+       */
+      error(e, t) {
+        return this.alert(e, t, { type: "error" });
+      },
+      /**
+       * 快捷方法 - 信息
+       */
+      info(e, t) {
+        return this.alert(e, t, { type: "info" });
+      },
+      /**
+       * 初始化
+       */
+      init() {
+        if (!document.getElementById("tMessageBoxOverlay")) {
+          const t = `
+                    <div class="t-message-box-overlay" id="tMessageBoxOverlay" onclick="if(event.target===this && TMessageBoxInstance.closeOnClickModal) TMessageBoxInstance.close('close')">
+                        <div class="t-message-box" id="tMessageBox">
+                            <div class="t-message-box-header">
+                                <h4 class="t-message-box-title" id="tMessageBoxTitle">提示</h4>
+                                <button class="t-message-box-close" id="tMessageBoxClose" onclick="TMessageBoxInstance.close('close')">×</button>
+                            </div>
+                            <div class="t-message-box-content">
+                                <div class="t-message-box-icon" id="tMessageBoxIcon"></div>
+                                <div class="t-message-box-message" id="tMessageBoxMessage"></div>
+                            </div>
+                            <div class="t-message-box-btns" id="tMessageBoxBtns"></div>
+                        </div>
+                    </div>
+                `;
+          document.body.insertAdjacentHTML("beforeend", t);
+        }
+        document.addEventListener("keydown", (t) => {
+          t.key === "Escape" && this.stack.length > 0 && this.close("close");
+        });
+      }
+    };
+    window.TMessageBoxInstance = L;
+    const Ce = {
+      /**
+       * 显示提示
+       * @param {string} tooltipId - 提示ID
+       */
+      show(e) {
+        const t = document.getElementById(e);
+        t && (t.classList.add("is-active"), t.setAttribute("aria-hidden", "false"));
+      },
+      /**
+       * 隐藏提示
+       * @param {string} tooltipId - 提示ID
+       */
+      hide(e) {
+        const t = document.getElementById(e);
+        t && (t.classList.remove("is-active"), t.setAttribute("aria-hidden", "true"));
+      },
+      /**
+       * 切换提示
+       * @param {string} tooltipId - 提示ID
+       */
+      toggle(e) {
+        const t = document.getElementById(e);
+        if (t) {
+          const s = t.classList.toggle("is-active");
+          t.setAttribute("aria-hidden", (!s).toString());
+        }
+      }
+    }, xe = {
+      /**
+       * 跳转到指定步骤
+       * @param {number} stepNumber - 步骤编号
+       * @param {string} stepsId - 步骤条ID（可选）
+       */
+      goTo(e, t) {
+        if (te.info("跳转到步骤 " + e), t) {
+          const s = document.getElementById(t);
+          s && s.dispatchEvent(new CustomEvent("t:steps:goto", {
+            detail: { step: e }
+          }));
+        }
+      },
+      /**
+       * 下一步
+       * @param {string} stepsId - 步骤条ID
+       */
+      next(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        const s = t.querySelectorAll(".t-step");
+        let n = -1;
+        s.forEach((i, a) => {
+          i.classList.contains("is-process") && (n = a);
+        }), n === -1 && s.forEach((i, a) => {
+          i.classList.contains("is-finish") && (n = a);
+        }), n >= 0 && n < s.length - 1 ? (s[n].classList.remove("is-process"), s[n].classList.add("is-finish"), s[n + 1].classList.remove("is-finish"), s[n + 1].classList.add("is-process"), t.dispatchEvent(new CustomEvent("t:steps:change", {
+          detail: { current: n + 2, previous: n + 1 }
+        }))) : n === -1 && s.length > 0 && s[0].classList.add("is-process");
+      },
+      /**
+       * 上一步
+       * @param {string} stepsId - 步骤条ID
+       */
+      prev(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        const s = t.querySelectorAll(".t-step");
+        let n = -1;
+        s.forEach((i, a) => {
+          i.classList.contains("is-process") && (n = a);
+        }), n > 0 && (s[n].classList.remove("is-process"), s[n - 1].classList.remove("is-finish"), s[n - 1].classList.add("is-process"), t.dispatchEvent(new CustomEvent("t:steps:change", {
+          detail: { current: n, previous: n + 1 }
+        })));
+      }
+    }, te = {
+      container: null,
+      /**
+       * 获取或创建消息容器
+       * @returns {HTMLElement}
+       */
+      getContainer() {
+        return this.container || (this.container = document.createElement("div"), this.container.className = "t-message-container", this.container.setAttribute("role", "region"), this.container.setAttribute("aria-label", "消息提示"), document.body.appendChild(this.container)), this.container;
+      },
+      /**
+       * 显示消息
+       * @param {Object} options - 配置选项
+       */
+      show(e = {}) {
+        const {
+          type: t = "info",
+          message: s = "",
+          duration: n = 3e3,
+          showClose: i = !1,
+          center: a = !1,
+          offset: o = 20,
+          showProgress: l = !1,
+          dangerouslyUseHTMLString: c = !1,
+          customClass: d = ""
+        } = e, m = this.getContainer(), r = document.createElement("div");
+        r.className = `t-message t-message--${t} ${a ? "is-center" : ""} ${d}`, r.setAttribute("role", "alert"), r.setAttribute("aria-live", "polite"), r.style.marginTop = `${o}px`;
+        const h = {
+          success: "✓",
+          warning: "⚠",
+          error: "✕",
+          info: "ℹ",
+          loading: "⟳"
+        }, f = c ? s : this.escapeHtml(s);
+        let u = "";
+        return t === "loading" ? u = '<span class="t-message-loading-icon"></span>' : u = `<i class="t-message-icon">${h[t] || h.info}</i>`, r.innerHTML = `
+                ${u}
+                <span class="t-message-content">${f}</span>
+                ${i ? '<button class="t-message-close" aria-label="关闭">×</button>' : ""}
+                ${l && n > 0 ? '<div class="t-message-progress"></div>' : ""}
+            `, m.appendChild(r), requestAnimationFrame(() => {
+          if (r.classList.add("show"), l && n > 0) {
+            const g = r.querySelector(".t-message-progress");
+            g && (g.style.width = "100%", g.style.transition = `width ${n}ms linear`, setTimeout(() => {
+              g.style.width = "0%";
+            }, 10));
+          }
+        }), i && r.querySelector(".t-message-close").addEventListener("click", () => {
+          this.close(r);
+        }), n > 0 && setTimeout(() => {
+          this.close(r);
+        }, n), r;
+      },
+      /**
+       * 关闭消息
+       * @param {HTMLElement} el - 消息元素
+       */
+      close(e) {
+        e && (e.classList.remove("show"), e.classList.add("hide"), setTimeout(() => {
+          e.parentNode && e.parentNode.removeChild(e);
+        }, 300));
+      },
+      /**
+       * 关闭所有消息
+       */
+      closeAll() {
+        this.container && Array.from(this.container.children).forEach((t) => this.close(t));
+      },
+      /**
+       * HTML 转义
+       * @param {string} text - 要转义的文本
+       * @returns {string} 转义后的文本
+       */
+      escapeHtml(e) {
+        const t = document.createElement("div");
+        return t.textContent = e, t.innerHTML;
+      },
+      // 快捷方法
+      success(e, t = {}) {
+        return this.show({ ...t, type: "success", message: e });
+      },
+      warning(e, t = {}) {
+        return this.show({ ...t, type: "warning", message: e });
+      },
+      error(e, t = {}) {
+        return this.show({ ...t, type: "error", message: e });
+      },
+      info(e, t = {}) {
+        return this.show({ ...t, type: "info", message: e });
+      },
+      loading(e, t = {}) {
+        return this.show({ ...t, type: "loading", message: e, duration: 0 });
+      }
+    }, ke = {
+      container: null,
+      idCounter: 0,
+      overlay: null,
+      // 遮罩层
+      /**
+       * 获取或创建 Alert 容器
+       * @returns {HTMLElement}
+       */
+      getContainer() {
+        return this.container || (this.container = document.createElement("div"), this.container.className = "t-alert-container", this.container.setAttribute("role", "region"), this.container.setAttribute("aria-label", "警告提示"), document.body.appendChild(this.container)), this.container;
+      },
+      /**
+       * 获取或创建遮罩层
+       * @returns {HTMLElement}
+       */
+      getOverlay() {
+        return this.overlay || (this.overlay = document.createElement("div"), this.overlay.className = "t-alert-overlay", document.body.appendChild(this.overlay)), this.overlay;
+      },
+      /**
+       * 显示遮罩层
+       */
+      showOverlay() {
+        const e = this.getOverlay();
+        e.style.display = "block", requestAnimationFrame(() => {
+          e.classList.add("show");
+        });
+      },
+      /**
+       * 隐藏遮罩层
+       */
+      hideOverlay() {
+        const e = this.getOverlay();
+        e.classList.remove("show"), setTimeout(() => {
+          this.container && this.container.children.length === 0 && (e.style.display = "none");
+        }, 300);
+      },
+      /**
+       * 显示警告
+       * @param {Object} options - 配置选项
+       * @returns {string} Alert ID
+       */
+      show(e = {}) {
+        const {
+          title: t = "",
+          description: s = "",
+          type: n = "",
+          effect: i = "light",
+          closable: a = !0,
+          closeText: o = "",
+          center: l = !1,
+          showIcon: c = !0,
+          showClose: d = !0,
+          customClass: m = "",
+          duration: r = 3e3,
+          // 默认 3 秒自动关闭
+          showProgress: h = !0,
+          // 默认显示进度条
+          showConfirm: f = !1,
+          collapsible: u = !1,
+          defaultExpanded: g = !0,
+          overlay: p = !1,
+          // 是否显示遮罩层
+          onConfirm: v,
+          onCancel: w
+        } = e, k = this.getContainer(), y = `t-alert-${++this.idCounter}`, R = {
+          success: "✓",
+          warning: "⚠",
+          error: "✕",
+          info: "ℹ"
+        }, C = document.createElement("div");
+        C.id = y, C.className = `t-alert ${n ? "t-alert-" + n : ""} ${i === "dark" ? "t-alert-dark" : ""} ${l ? "t-alert-center" : ""} ${m} ${u ? "t-alert--collapsible" : ""} ${p ? "t-alert--with-overlay" : ""}`, C.style.position = "relative", C.style.zIndex = "9999", p && this.showOverlay();
+        const O = n && c ? `<div class="t-alert-icon">${R[n] || ""}</div>` : "", Ae = a && d ? `<button class="t-alert-close" onclick="TbeUI.Alert.close('${y}')" ${o ? 'style="width: auto; padding: 0 12px; border-radius: 12px;"' : ""}>${o || "×"}</button>` : "";
+        let oe = "";
+        if (s)
+          if (u) {
+            const F = g ? "expanded" : "collapsed", Me = g ? "▲" : "▼";
+            oe = `
+                        <div class="t-alert-description ${F}" id="${y}-desc">${this.escapeHtml(s)}</div>
+                        <div class="t-alert-toggle" onclick="TbeUI.Alert.toggleDescription('${y}')">
+                            <span id="${y}-toggle-text">${g ? "收起" : "展开"}</span>
+                            <span class="t-alert-toggle-icon ${F}" id="${y}-toggle-icon">${Me}</span>
+                        </div>
+                    `;
+          } else
+            oe = `<div class="t-alert-description">${this.escapeHtml(s)}</div>`;
+        let we = "";
+        f && (we = `
+                    <div class="t-alert-actions">
+                        <button class="t-alert-action-btn" onclick="TbeUI.Alert.close('${y}'); ${w ? `(${w.toString()})()` : ""}">取消</button>
+                        <button class="t-alert-action-btn primary" onclick="TbeUI.Alert.close('${y}'); ${v ? `(${v.toString()})()` : ""}">确认</button>
+                    </div>
+                `);
+        let be = "";
+        return h && r > 0 && (be = `
+                    <div class="t-alert__progress">
+                        <div class="t-alert__progress-bar" id="${y}-progress"></div>
+                    </div>
+                `), C.innerHTML = `
+                ${O}
+                <div class="t-alert-content">
+                    <div class="t-alert-title">${this.escapeHtml(t)}</div>
+                    ${oe}
+                    ${we}
+                </div>
+                ${Ae}
+                ${be}
+            `, k.appendChild(C), requestAnimationFrame(() => {
+          if (C.classList.add("show"), h && r > 0) {
+            const F = document.getElementById(`${y}-progress`);
+            F && (F.style.transition = `transform ${r}ms linear`, F.style.transform = "scaleX(0)");
+          }
+        }), r > 0 && setTimeout(() => {
+          this.close(y);
+        }, r), y;
+      },
+      /**
+       * 关闭指定 Alert
+       * @param {string} id - Alert ID
+       */
+      close(e) {
+        const t = document.getElementById(e);
+        t && (t.classList.remove("show"), setTimeout(() => {
+          t.parentNode && t.parentNode.removeChild(t), this.container && this.container.children.length === 0 && this.hideOverlay();
+        }, 300));
+      },
+      /**
+       * 切换 Alert 描述展开/收起
+       * @param {string} alertId - Alert ID
+       */
+      toggleDescription(e) {
+        const t = document.getElementById(`${e}-desc`), s = document.getElementById(`${e}-toggle-text`), n = document.getElementById(`${e}-toggle-icon`);
+        t && s && n && (t.classList.contains("collapsed") ? (t.classList.remove("collapsed"), t.classList.add("expanded"), s.textContent = "收起", n.textContent = "▲", n.classList.add("expanded")) : (t.classList.remove("expanded"), t.classList.add("collapsed"), s.textContent = "展开", n.textContent = "▼", n.classList.remove("expanded")));
+      },
+      /**
+       * 关闭所有 Alert
+       */
+      closeAll() {
+        document.querySelectorAll(".t-alert").forEach((e) => {
+          this.close(e.id);
+        });
+      },
+      /**
+       * HTML 转义
+       * @param {string} text - 要转义的文本
+       * @returns {string} 转义后的文本
+       */
+      escapeHtml(e) {
+        const t = document.createElement("div");
+        return t.textContent = e, t.innerHTML;
+      },
+      // 快捷方法
+      success(e, t = {}) {
+        return this.show({ ...t, type: "success", title: e });
+      },
+      warning(e, t = {}) {
+        return this.show({ ...t, type: "warning", title: e });
+      },
+      error(e, t = {}) {
+        return this.show({ ...t, type: "error", title: e });
+      },
+      info(e, t = {}) {
+        return this.show({ ...t, type: "info", title: e });
+      }
+    }, Be = {
+      container: null,
+      idCounter: 0,
+      /**
+       * 获取或创建通知容器
+       * @param {string} position - 位置
+       * @returns {HTMLElement}
+       */
+      getContainer(e = "top-right") {
+        const t = `t-notification-container-${e}`;
+        let s = document.getElementById(t);
+        return s || (s = document.createElement("div"), s.id = t, s.className = `t-notification-container t-notification-container-${e}`, s.setAttribute("role", "region"), s.setAttribute("aria-label", "通知"), document.body.appendChild(s)), s;
+      },
+      /**
+       * 显示通知
+       * @param {Object} options - 配置选项
+       */
+      show(e = {}) {
+        const {
+          type: t = "info",
+          title: s = "",
+          message: n = "",
+          duration: i = 4500,
+          showClose: a = !0,
+          position: o = "top-right",
+          offset: l = 0,
+          showProgress: c = !1,
+          dangerouslyUseHTMLString: d = !1,
+          customClass: m = "",
+          icon: r = ""
+        } = e, h = this.getContainer(o), f = `t-notification-${++this.idCounter}`, u = document.createElement("div");
+        u.id = f, u.className = `t-notification t-notification--${t} ${m}`, u.setAttribute("role", "alert"), u.style.marginTop = `${l}px`;
+        const g = {
+          success: "✓",
+          warning: "⚠",
+          error: "✕",
+          info: "ℹ"
+        }, p = d ? n : this.escapeHtml(n), v = d ? s : this.escapeHtml(s);
+        let w = "";
+        r ? w = `<div class="t-notification-icon">${r}</div>` : w = `<div class="t-notification-icon">${g[t] || g.info}</div>`;
+        let k = "";
+        return e.actions && e.actions.length > 0 && (k = '<div class="t-notification-actions">', e.actions.forEach((y, R) => {
+          const C = y.type || "";
+          k += `<button class="t-notification-action-btn ${C}" data-action-index="${R}">${y.text}</button>`;
+        }), k += "</div>"), u.innerHTML = `
+                ${w}
+                <div class="t-notification-content">
+                    <div class="t-notification-title">${v}</div>
+                    <div class="t-notification-message">${p}</div>
+                    ${k}
+                </div>
+                ${a ? '<button class="t-notification-close" aria-label="关闭通知">×</button>' : ""}
+                ${c && i > 0 ? '<div class="t-notification-progress"></div>' : ""}
+            `, a && u.querySelector(".t-notification-close").addEventListener("click", () => {
+          this.close(f);
+        }), e.actions && e.actions.length > 0 && u.querySelectorAll(".t-notification-action-btn").forEach((R, C) => {
+          R.addEventListener("click", () => {
+            const O = e.actions[C];
+            O && typeof O.callback == "function" && O.callback(), this.close(f);
+          });
+        }), h.appendChild(u), requestAnimationFrame(() => {
+          if (u.classList.add("show"), c && i > 0) {
+            const y = u.querySelector(".t-notification-progress");
+            y && (y.style.width = "100%", y.style.transition = `width ${i}ms linear`, setTimeout(() => {
+              y.style.width = "0%";
+            }, 10));
+          }
+        }), i > 0 && setTimeout(() => {
+          this.close(f);
+        }, i), f;
+      },
+      /**
+       * HTML 转义
+       * @param {string} text - 要转义的文本
+       * @returns {string} 转义后的文本
+       */
+      escapeHtml(e) {
+        const t = document.createElement("div");
+        return t.textContent = e, t.innerHTML;
+      },
+      /**
+       * 关闭通知
+       * @param {string} id - 通知 ID
+       */
+      close(e) {
+        const t = document.getElementById(e);
+        t && (t.classList.remove("show"), t.classList.add("hide"), setTimeout(() => {
+          t.parentNode && t.parentNode.removeChild(t);
+        }, 300));
+      },
+      /**
+       * 关闭所有通知
+       */
+      closeAll() {
+        document.querySelectorAll(".t-notification-container").forEach((t) => {
+          for (; t.firstChild; )
+            t.firstChild.id ? this.close(t.firstChild.id) : t.removeChild(t.firstChild);
+        });
+      },
+      /**
+       * 带操作按钮的通知示例
+       */
+      showNotificationWithAction() {
+        this.show({
+          type: "warning",
+          title: "确认删除",
+          message: "确定要删除这条记录吗？此操作不可恢复。",
+          duration: 0,
+          showProgress: !1,
+          actions: [
+            { text: "取消", callback: () => {
+            } },
+            { text: "确认删除", primary: !0, callback: () => {
+              this.show({ type: "success", title: "已删除", message: "记录已成功删除", duration: 3e3 });
+            } }
+          ]
+        });
+      },
+      /**
+       * 显示分组通知
+       */
+      showGroupedNotifications() {
+        [
+          { type: "success", title: "消息 1", message: "这是第一条分组消息" },
+          { type: "info", title: "消息 2", message: "这是第二条分组消息" },
+          { type: "warning", title: "消息 3", message: "这是第三条分组消息" }
+        ].forEach((t, s) => {
+          setTimeout(() => {
+            this.show({ ...t, duration: 5e3 });
+          }, s * 300);
+        });
+      }
+    }, re = {
+      activeMenu: null,
+      /**
+       * 初始化导航菜单
+       * @param {string} selector - 导航菜单选择器
+       * @param {Object} options - 配置选项
+       */
+      init(e = ".t-nav-menu", t = {}) {
+        return document.querySelectorAll(e).forEach((n) => {
+          n.querySelectorAll(".t-nav-submenu > .t-nav-menu-item").forEach((i) => {
+            i.addEventListener("click", (a) => {
+              t.accordion !== !1 && i.parentElement.parentElement.querySelectorAll(".t-nav-submenu.is-opened").forEach((l) => {
+                l !== i.parentElement && l.classList.remove("is-opened");
+              }), i.parentElement.classList.toggle("is-opened"), n.dispatchEvent(new CustomEvent("t:navmenu:toggle", {
+                detail: { item: i, isOpen: i.parentElement.classList.contains("is-opened") }
+              }));
+            });
+          }), n.querySelectorAll(".t-nav-menu-item:not(.t-nav-submenu > .t-nav-menu-item)").forEach((i) => {
+            i.addEventListener("click", (a) => {
+              n.querySelectorAll(".t-nav-menu-item.active").forEach((o) => {
+                o !== i && o.classList.remove("active");
+              }), i.classList.add("active"), n.dispatchEvent(new CustomEvent("t:navmenu:select", {
+                detail: { item: i, index: Array.from(n.querySelectorAll(".t-nav-menu-item")).indexOf(i) }
+              }));
+            });
+          });
+        }), this;
+      },
+      /**
+       * 打开子菜单
+       * @param {HTMLElement} submenu - 子菜单元素
+       */
+      openSubmenu(e) {
+        e && e.classList.contains("t-nav-submenu") && e.classList.add("is-opened");
+      },
+      /**
+       * 关闭子菜单
+       * @param {HTMLElement} submenu - 子菜单元素
+       */
+      closeSubmenu(e) {
+        e && e.classList.contains("t-nav-submenu") && e.classList.remove("is-opened");
+      },
+      /**
+       * 折叠菜单（仅显示图标）
+       * @param {string} selector - 导航菜单选择器
+       */
+      collapse(e = ".t-nav-menu") {
+        const t = document.querySelector(e);
+        t && t.classList.add("t-nav-menu--collapsed");
+      },
+      /**
+       * 展开菜单
+       * @param {string} selector - 导航菜单选择器
+       */
+      expand(e = ".t-nav-menu") {
+        const t = document.querySelector(e);
+        t && t.classList.remove("t-nav-menu--collapsed");
+      },
+      /**
+       * 移动端：打开侧边栏
+       * @param {string} sidebarSelector - 侧边栏选择器
+       * @param {string} overlaySelector - 遮罩层选择器
+       */
+      openMobileSidebar(e = ".sidebar", t = ".sidebar-overlay") {
+        const s = document.querySelector(e), n = document.querySelector(t);
+        s && (s.classList.add("active"), document.body.style.overflow = "hidden"), n && n.classList.add("active");
+      },
+      /**
+       * 移动端：关闭侧边栏
+       * @param {string} sidebarSelector - 侧边栏选择器
+       * @param {string} overlaySelector - 遮罩层选择器
+       */
+      closeMobileSidebar(e = ".sidebar", t = ".sidebar-overlay") {
+        const s = document.querySelector(e), n = document.querySelector(t);
+        s && s.classList.remove("active"), n && n.classList.remove("active"), document.body.style.overflow = "";
+      },
+      /**
+       * 移动端：切换侧边栏
+       * @param {string} sidebarSelector - 侧边栏选择器
+       * @param {string} overlaySelector - 遮罩层选择器
+       */
+      toggleMobileSidebar(e = ".sidebar", t = ".sidebar-overlay") {
+        const s = document.querySelector(e);
+        s && s.classList.contains("active") ? this.closeMobileSidebar(e, t) : this.openMobileSidebar(e, t);
+      }
+    }, de = {
+      instances: /* @__PURE__ */ new Map(),
+      /**
+       * 初始化回到顶部组件
+       * @param {string} selector - 按钮选择器
+       * @param {Object} options - 配置选项
+       */
+      init(e = ".t-backtop", t = {}) {
+        return document.querySelectorAll(e).forEach((n) => {
+          const i = {
+            visibilityOffset: 200,
+            scrollDuration: 300,
+            target: null,
+            ...t
+          };
+          let a;
+          const o = n.getAttribute("data-target");
+          o ? a = document.getElementById(o) : i.target && (a = typeof i.target == "string" ? document.querySelector(i.target) : i.target), a || (a = window), this.instances.set(n, { scrollTarget: a, config: i }), n.addEventListener("click", (c) => {
+            c.preventDefault(), this.scrollToTop(n);
+          });
+          const l = S(() => {
+            this.updateVisibility(n);
+          }, 100);
+          a === window ? window.addEventListener("scroll", l) : a.addEventListener("scroll", l), this.updateVisibility(n);
+        }), this;
+      },
+      /**
+       * 更新按钮可见性
+       * @param {HTMLElement} button - 按钮元素
+       */
+      updateVisibility(e) {
+        const t = this.instances.get(e);
+        if (!t)
+          return;
+        const { scrollTarget: s, config: n } = t;
+        let i;
+        s === window ? i = window.pageYOffset || document.documentElement.scrollTop : i = s.scrollTop, i > n.visibilityOffset ? e.classList.add("is-visible") : e.classList.remove("is-visible");
+      },
+      /**
+       * 滚动到顶部
+       * @param {HTMLElement} button - 按钮元素
+       */
+      scrollToTop(e) {
+        const t = this.instances.get(e);
+        if (!t)
+          return;
+        const { scrollTarget: s, config: n } = t;
+        s === window ? window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        }) : s.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        }), e.dispatchEvent(new CustomEvent("t:backtop:click"));
+      },
+      /**
+       * 销毁实例
+       * @param {string} selector - 按钮选择器
+       */
+      destroy(e = ".t-backtop") {
+        document.querySelectorAll(e).forEach((t) => {
+          this.instances.delete(t);
+        });
+      }
+    }, se = {
+      /**
+       * 切换开关状态（兼容旧版调用方式）
+       * @param {string} switchId - 开关ID
+       */
+      toggleSwitch(e) {
+        this.toggle(e);
+      },
+      /**
+       * 切换开关状态
+       * @param {string} switchId - 开关ID
+       */
+      toggle(e) {
+        const t = document.getElementById(e);
+        if (!t || t.classList.contains("is-disabled"))
+          return;
+        const s = t.querySelector(".t-switch__input");
+        if (s) {
+          s.checked = !s.checked, t.classList.toggle("is-checked", s.checked), t.setAttribute("aria-checked", s.checked.toString()), t.dispatchEvent(new CustomEvent("t:switch:change", {
+            detail: { checked: s.checked }
+          }));
+          const n = document.getElementById(e + "-value");
+          n && (n.textContent = "当前值: " + s.checked);
+        }
+      },
+      /**
+       * 初始化所有 Switch 组件
+       */
+      init() {
+        document.querySelectorAll(".t-switch").forEach((e) => {
+          const t = e.querySelector(".t-switch__input");
+          t && t.addEventListener("change", () => {
+            e.classList.toggle("is-checked", t.checked), e.setAttribute("aria-checked", t.checked.toString());
+          });
+        });
+      }
+    }, K = {
+      /**
+       * 点击滑块轨道（兼容旧版调用方式）
+       * @param {Event} event - 点击事件
+       * @param {string} sliderId - 滑块ID
+       */
+      clickSlider(e, t) {
+        this.click(e, t);
+      },
+      /**
+       * 开始拖拽滑块按钮（兼容旧版调用方式）
+       * @param {Event} event - 鼠标事件
+       * @param {string} sliderId - 滑块ID
+       * @param {number} buttonIdx - 按钮索引
+       */
+      startDragSlider(e, t, s = 0) {
+        typeof s == "string" && (s = parseInt(s, 10) || 0);
+        const n = document.getElementById(t);
+        if (!n)
+          return;
+        const a = n.querySelectorAll(".t-slider__button-wrapper")[s];
+        if (a) {
+          const o = {
+            preventDefault: () => e.preventDefault(),
+            stopPropagation: () => e.stopPropagation(),
+            currentTarget: a,
+            clientX: e.clientX,
+            clientY: e.clientY
+          };
+          this.startDrag(o, t);
+        }
+      },
+      /**
+       * 更新滑块值
+       * @param {string} sliderId - 滑块ID
+       * @param {number} percent - 百分比 (0-100)
+       * @param {number} buttonIdx - 按钮索引
+       */
+      updateValue(e, t, s = 0) {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        const i = n.querySelector(".t-slider__runway"), a = n.querySelector(".t-slider__bar"), o = n.querySelectorAll(".t-slider__button-wrapper");
+        if (i && a && o[s]) {
+          const l = o[s];
+          l.style.left = t + "%";
+          const c = l.querySelector(".t-slider__tooltip");
+          c && (c.textContent = Math.round(t) + "%");
+          const d = n.querySelector(".t-slider__value");
+          if (d && (d.textContent = Math.round(t)), n.classList.contains("is-range") && o.length >= 2) {
+            const m = o[0], r = o[1], h = Math.min(parseFloat(m.style.left), parseFloat(r.style.left)), f = Math.max(parseFloat(m.style.left), parseFloat(r.style.left));
+            a.style.left = h + "%", a.style.width = f - h + "%";
+          } else
+            a.style.left = "0%", a.style.width = t + "%";
+          n.dispatchEvent(new CustomEvent("t:slider:change", {
+            detail: { value: t, buttonIndex: s }
+          }));
+        }
+      },
+      /**
+       * 点击滑块轨道更新值
+       * @param {Event} event - 点击事件
+       * @param {string} sliderId - 滑块ID
+       */
+      click(e, t) {
+        const s = document.getElementById(t);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-slider__runway");
+        if (!n)
+          return;
+        const i = n.getBoundingClientRect();
+        let a = (e.clientX - i.left) / i.width * 100;
+        if (a = Math.max(0, Math.min(100, a)), s.classList.contains("is-range")) {
+          const o = s.querySelectorAll(".t-slider__button-wrapper");
+          if (o.length >= 2) {
+            const l = parseFloat(o[0].style.left), c = parseFloat(o[1].style.left), d = Math.abs(a - l), m = Math.abs(a - c), r = d < m ? 0 : 1;
+            this.updateValue(t, a, r);
+          }
+        } else
+          this.updateValue(t, a, 0);
+      },
+      /**
+       * 开始拖拽滑块按钮
+       * @param {Event} event - 鼠标事件
+       * @param {string} sliderId - 滑块ID
+       */
+      startDrag(e, t) {
+        e.preventDefault(), e.stopPropagation();
+        const s = document.getElementById(t);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-slider__runway"), i = e.currentTarget, a = s.querySelectorAll(".t-slider__button-wrapper"), o = Array.from(a).indexOf(i);
+        if (!n || !i)
+          return;
+        i.classList.add("is-dragging");
+        const l = (d) => {
+          const m = n.getBoundingClientRect();
+          let r = (d.clientX - m.left) / m.width * 100;
+          if (r = Math.max(0, Math.min(100, r)), s.classList.contains("is-range") && a.length >= 2) {
+            const f = a[o === 0 ? 1 : 0], u = parseFloat(f.style.left);
+            o === 0 ? r = Math.min(r, u - 1) : r = Math.max(r, u + 1);
+          }
+          this.updateValue(t, r, o);
+        }, c = () => {
+          i.classList.remove("is-dragging"), document.removeEventListener("mousemove", l), document.removeEventListener("mouseup", c);
+        };
+        document.addEventListener("mousemove", l), document.addEventListener("mouseup", c);
+      },
+      /**
+       * 初始化所有 Slider 组件
+       */
+      init() {
+        document.querySelectorAll(".t-slider").forEach((e) => {
+          let t = !1, s = null;
+          const n = e.querySelectorAll(".t-slider__button-wrapper"), i = e.querySelector(".t-slider__runway");
+          n.forEach((a, o) => {
+            a.addEventListener("mousedown", (l) => {
+              t = !0, s = a, a.classList.add("is-dragging"), l.preventDefault();
+            });
+          }), document.addEventListener("mousemove", (a) => {
+            if (!t || !s || !i)
+              return;
+            const o = i.getBoundingClientRect();
+            let l = (a.clientX - o.left) / o.width * 100;
+            l = Math.max(0, Math.min(100, l));
+            const c = Array.from(n).indexOf(s);
+            this.updateValue(e.id, l, c);
+          }), document.addEventListener("mouseup", () => {
+            s && s.classList.remove("is-dragging"), t = !1, s = null;
+          });
+        });
+      }
+    }, W = {
+      /**
+       * 存储评分组件状态
+       */
+      states: {},
+      /**
+       * 设置评分值（兼容旧版调用方式）
+       * @param {string} rateId - 评分组件ID
+       * @param {number} value - 评分值 (1-5)
+       */
+      setRate(e, t) {
+        this.set(e, t);
+      },
+      /**
+       * 鼠标悬停效果（兼容旧版调用方式）
+       * @param {string} rateId - 评分组件ID
+       * @param {number} value - 悬停的评分值
+       */
+      hoverRate(e, t) {
+        this.hover(e, t);
+      },
+      /**
+       * 鼠标离开效果（兼容旧版调用方式）
+       * @param {string} rateId - 评分组件ID
+       */
+      leaveRate(e) {
+        this.leave(e);
+      },
+      /**
+       * 设置评分值
+       * @param {string} rateId - 评分组件ID
+       * @param {number} value - 评分值 (1-5)
+       */
+      set(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        this.states[e] || (this.states[e] = { value: 0 }), this.states[e].value = t, s.querySelectorAll(".t-rate-star, .t-rate__star").forEach((o, l) => {
+          l < t ? o.classList.add("active", "is-active") : o.classList.remove("active", "is-active");
+        });
+        const i = document.getElementById(e + "-text");
+        if (i) {
+          const o = ["很差", "较差", "一般", "满意", "非常满意"];
+          i.textContent = o[t - 1] || "";
+        }
+        const a = document.getElementById(e + "-score");
+        a && (a.textContent = t + " 分"), s.dispatchEvent(new CustomEvent("t:rate:change", {
+          detail: { value: t }
+        }));
+      },
+      /**
+       * 鼠标悬停效果
+       * @param {string} rateId - 评分组件ID
+       * @param {number} value - 悬停的评分值
+       */
+      hover(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        s.querySelectorAll(".t-rate-star, .t-rate__star").forEach((a, o) => {
+          o < t ? a.classList.add("hover", "is-hover") : a.classList.remove("hover", "is-hover");
+        });
+        const i = document.getElementById(e + "-text");
+        if (i) {
+          const a = ["很差", "较差", "一般", "满意", "非常满意"];
+          i.textContent = a[t - 1] || "";
+        }
+      },
+      /**
+       * 鼠标离开效果
+       * @param {string} rateId - 评分组件ID
+       */
+      leave(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        t.querySelectorAll(".t-rate-star, .t-rate__star").forEach((i) => {
+          i.classList.remove("hover", "is-hover");
+        });
+        const n = this.states[e];
+        n && this.set(e, n.value);
+      }
+    }, ne = {
+      /**
+       * 显示加载
+       * @param {HTMLElement} target - 目标元素
+       * @param {Object} options - 配置选项
+       */
+      show(e, t = {}) {
+        if (!e)
+          return;
+        const s = t.text || "加载中...", n = t.fullscreen || !1, i = document.createElement("div");
+        return i.className = "t-loading-mask", i.innerHTML = `
+                <div class="t-loading-spinner">
+                    <div class="t-loading-spinner__circle"></div>
+                    ${s ? `<p class="t-loading-text">${s}</p>` : ""}
+                </div>
+            `, n ? (i.classList.add("is-fullscreen"), document.body.appendChild(i)) : (e.style.position = "relative", e.appendChild(i)), i;
+      },
+      /**
+       * 关闭加载
+       * @param {HTMLElement} loadingEl - 加载元素
+       */
+      close(e) {
+        e && e.parentNode && e.parentNode.removeChild(e);
+      },
+      /**
+       * 全屏加载
+       * @param {Object} options - 配置选项
+       * @returns {Object} 关闭方法
+       */
+      fullscreen(e = {}) {
+        const t = this.show(null, { ...e, fullscreen: !0 });
+        return {
+          close: () => this.close(t)
+        };
+      },
+      /**
+       * Loading 服务方式
+       * @param {Object} options - 配置选项
+       * @returns {Object} 实例，包含 close 方法
+       */
+      service(e = {}) {
+        const {
+          text: t = "加载中...",
+          fullscreen: s = !0,
+          lock: n = !1,
+          spinner: i = "spinner",
+          background: a = "",
+          customClass: o = ""
+        } = e, l = document.createElement("div");
+        l.className = "t-loading-mask" + (s ? " fullscreen" : ""), o && l.classList.add(o), a && (l.style.background = a);
+        let c = "";
+        switch (i) {
+          case "wave":
+            c = '<div class="t-loading-wave"><span></span><span></span><span></span><span></span><span></span></div>';
+            break;
+          case "dots":
+            c = '<div class="t-loading-dots"><span></span><span></span><span></span></div>';
+            break;
+          case "ring":
+            c = '<div class="t-loading-ring"></div>';
+            break;
+          case "square":
+            c = '<div class="t-loading-square"></div>';
+            break;
+          case "gradient":
+            c = '<div class="t-loading-gradient"></div>';
+            break;
+          default:
+            c = '<div class="t-loading-spinner"><div class="t-loading-spinner__circle"></div></div>';
+        }
+        return l.innerHTML = `
+                ${c}
+                ${t ? `<p class="t-loading-text">${t}</p>` : ""}
+            `, s && (document.body.appendChild(l), l.classList.add("active"), n && (document.body.style.overflow = "hidden")), {
+          close: () => {
+            l.parentNode && l.parentNode.removeChild(l), n && s && (document.body.style.overflow = "");
+          }
+        };
+      },
+      /**
+       * 初始化 Loading 组件
+       */
+      init() {
+      }
+    }, X = {
+      /**
+       * 切换折叠面板
+       * @param {HTMLElement} header - 面板头部元素
+       */
+      toggle(e) {
+        const t = e.closest(".t-collapse-item");
+        if (!t || t.classList.contains("t-collapse-item--disabled"))
+          return;
+        const s = t.parentElement, n = !s.classList.contains("t-collapse--multiple"), i = t.classList.contains("active");
+        n && !i && s.querySelectorAll(".t-collapse-item.active").forEach((c) => {
+          c.classList.remove("active");
+          const d = c.querySelector(".t-collapse-content, .t-collapse-item__content");
+          d && (d.style.maxHeight = "0");
+          const m = c.querySelector(".t-collapse-arrow");
+          m && (m.style.transform = "rotate(0deg)");
+        }), t.classList.toggle("active");
+        const a = t.querySelector(".t-collapse-content") || t.querySelector(".t-collapse-item__content") || t.querySelector(".t-collapse-body"), o = t.querySelector(".t-collapse-arrow");
+        if (a && (t.classList.contains("active") ? a.style.maxHeight = a.scrollHeight + "px" : a.style.maxHeight = "0"), o) {
+          const l = t.classList.contains("active");
+          o.style.transform = l ? "rotate(90deg)" : "rotate(0deg)";
+        }
+        e.setAttribute("aria-expanded", t.classList.contains("active").toString()), t.dispatchEvent(new CustomEvent("t:collapse:change", {
+          detail: { isActive: t.classList.contains("active") }
+        }));
+      },
+      /**
+       * 初始化所有 Collapse 组件
+       */
+      init() {
+        document.querySelectorAll(".t-collapse").forEach((e) => {
+          e.querySelectorAll(".t-collapse-header, .t-collapse-item__header").forEach((s) => {
+            s.getAttribute("onclick") || s.addEventListener("click", function(n) {
+              const i = s.closest(".t-collapse-item");
+              if (i && i.classList.contains("t-collapse-item--disabled")) {
+                n.preventDefault();
+                return;
+              }
+              X.toggle(s);
+            });
+          });
+        });
+      }
+    }, Te = {
+      timers: {},
+      /**
+       * 开始倒计时
+       * @param {string} id - 倒计时元素ID
+       * @param {Date} endTime - 结束时间
+       * @param {string} format - 格式 (dd天HH小时mm分ss秒)
+       */
+      start(e, t, s = "HH:mm:ss") {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        this.timers[e] && clearInterval(this.timers[e]);
+        const i = () => {
+          const a = (/* @__PURE__ */ new Date()).getTime(), l = new Date(t).getTime() - a;
+          if (l <= 0) {
+            n.textContent = "已结束", clearInterval(this.timers[e]), delete this.timers[e], n.dispatchEvent(new CustomEvent("t:countdown:end"));
+            return;
+          }
+          const c = Math.floor(l / (1e3 * 60 * 60 * 24)), d = Math.floor(l % (1e3 * 60 * 60 * 24) / (1e3 * 60 * 60)), m = Math.floor(l % (1e3 * 60 * 60) / (1e3 * 60)), r = Math.floor(l % (1e3 * 60) / 1e3);
+          let h = s;
+          h = h.replace("dd", String(c).padStart(2, "0")), h = h.replace("HH", String(d).padStart(2, "0")), h = h.replace("mm", String(m).padStart(2, "0")), h = h.replace("ss", String(r).padStart(2, "0")), n.textContent = h;
+        };
+        i(), this.timers[e] = setInterval(i, 1e3);
+      },
+      /**
+       * 停止倒计时
+       * @param {string} id - 倒计时元素ID
+       */
+      stop(e) {
+        this.timers[e] && (clearInterval(this.timers[e]), delete this.timers[e]);
+      }
+    }, j = {
+      /**
+       * 存储颜色选择器状态
+       */
+      states: {},
+      /**
+       * 切换颜色选择器显示/隐藏（兼容旧版调用方式）
+       * @param {string} pickerId - 选择器ID
+       * @param {Event} event - 事件对象
+       */
+      toggleColorPicker(e, t) {
+        t && (t.stopPropagation(), t.preventDefault()), this.toggle(e);
+      },
+      /**
+       * 选择预设颜色（兼容旧版调用方式）
+       * @param {string} pickerId - 选择器ID
+       * @param {string} color - 颜色值
+       * @param {Event} event - 事件对象
+       */
+      selectPredefineColor(e, t, s) {
+        s && (s.stopPropagation(), s.preventDefault()), this.setColor(e, t);
+      },
+      /**
+       * 确认颜色选择（兼容旧版调用方式）
+       * @param {string} pickerId - 选择器ID
+       */
+      confirmColor(e) {
+        this.close(e);
+      },
+      /**
+       * 打开颜色选择器
+       * @param {string} pickerId - 选择器ID
+       */
+      open(e) {
+        const t = document.getElementById(e);
+        t && (t.classList.add("active"), t.setAttribute("aria-hidden", "false"), this.initEvents(e));
+      },
+      /**
+       * 关闭颜色选择器
+       * @param {string} pickerId - 选择器ID
+       */
+      close(e) {
+        const t = document.getElementById(e);
+        t && t.classList.remove("active");
+      },
+      /**
+       * 切换颜色选择器显示/隐藏
+       * @param {string} pickerId - 选择器ID
+       */
+      toggle(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        const s = t.classList.contains("active");
+        document.querySelectorAll(".t-color-picker.active").forEach((n) => {
+          n.id !== e && (n.classList.remove("active"), n.setAttribute("aria-hidden", "true"));
+        }), s ? this.close(e) : (this.open(e), setTimeout(() => {
+          const n = (i) => {
+            t.contains(i.target) || (this.close(e), document.removeEventListener("click", n));
+          };
+          document.addEventListener("click", n);
+        }, 0));
+      },
+      /**
+       * 初始化事件
+       * @param {string} pickerId - 选择器ID
+       */
+      initEvents(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        if (!this.states[e]) {
+          const a = t.querySelector(".t-color-alpha-slider");
+          this.states[e] = {
+            hue: 210,
+            saturation: 100,
+            value: 100,
+            alpha: a ? 0.6 : 1
+          };
+        }
+        this.updateSaturationBackground(e), this.updateCursors(e);
+        const s = t.querySelector(".t-color-saturation");
+        s && (s.addEventListener("click", (a) => this.handleSaturationClick(e, a)), s.addEventListener("mousedown", (a) => this.startSaturationDrag(e, a)));
+        const n = t.querySelector(".t-color-hue-slider");
+        n && (n.addEventListener("click", (a) => this.handleHueClick(e, a)), n.addEventListener("mousedown", (a) => this.startHueDrag(e, a)));
+        const i = t.querySelector(".t-color-alpha-slider");
+        i && (i.addEventListener("click", (a) => this.handleAlphaClick(e, a)), i.addEventListener("mousedown", (a) => this.startAlphaDrag(e, a)));
+      },
+      /**
+       * 处理色盘点击
+       * @param {string} pickerId - 选择器ID
+       * @param {Event} event - 点击事件
+       */
+      handleSaturationClick(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-color-saturation");
+        if (!n)
+          return;
+        const i = n.getBoundingClientRect(), a = t.clientX - i.left, o = t.clientY - i.top, l = a / i.width * 100, c = 100 - o / i.height * 100;
+        this.updateColor(e, {
+          saturation: l,
+          value: c
+        });
+      },
+      /**
+       * 开始色盘拖拽
+       * @param {string} pickerId - 选择器ID
+       * @param {Event} event - 鼠标事件
+       */
+      startSaturationDrag(e, t) {
+        t.preventDefault();
+        const s = (i) => {
+          this.handleSaturationClick(e, i);
+        }, n = () => {
+          document.removeEventListener("mousemove", s), document.removeEventListener("mouseup", n);
+        };
+        document.addEventListener("mousemove", s), document.addEventListener("mouseup", n);
+      },
+      /**
+       * 处理色谱点击
+       * @param {string} pickerId - 选择器ID
+       * @param {Event} event - 点击事件
+       */
+      handleHueClick(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-color-hue-slider");
+        if (!n)
+          return;
+        const i = n.getBoundingClientRect(), o = (t.clientY - i.top) / i.height * 360;
+        this.updateColor(e, {
+          hue: o
+        });
+      },
+      /**
+       * 开始色谱拖拽
+       * @param {string} pickerId - 选择器ID
+       * @param {Event} event - 鼠标事件
+       */
+      startHueDrag(e, t) {
+        t.preventDefault();
+        const s = (i) => {
+          this.handleHueClick(e, i);
+        }, n = () => {
+          document.removeEventListener("mousemove", s), document.removeEventListener("mouseup", n);
+        };
+        document.addEventListener("mousemove", s), document.addEventListener("mouseup", n);
+      },
+      /**
+       * 处理透明度点击
+       * @param {string} pickerId - 选择器ID
+       * @param {Event} event - 点击事件
+       */
+      handleAlphaClick(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-color-alpha-slider");
+        if (!n)
+          return;
+        const i = n.getBoundingClientRect();
+        let a = t.clientX - i.left;
+        a = Math.max(0, Math.min(a, i.width - 2));
+        let o = Math.round(a / i.width * 10) / 10;
+        o = Math.max(0.1, Math.min(0.9, o)), this.updateColor(e, {
+          alpha: o
+        });
+      },
+      /**
+       * 开始透明度拖拽
+       * @param {string} pickerId - 选择器ID
+       * @param {Event} event - 鼠标事件
+       */
+      startAlphaDrag(e, t) {
+        t.preventDefault();
+        const s = (i) => {
+          this.handleAlphaClick(e, i);
+        }, n = () => {
+          document.removeEventListener("mousemove", s), document.removeEventListener("mouseup", n);
+        };
+        document.addEventListener("mousemove", s), document.addEventListener("mouseup", n);
+      },
+      /**
+       * 更新颜色
+       * @param {string} pickerId - 选择器ID
+       * @param {Object} changes - 颜色变化
+       */
+      updateColor(e, t) {
+        const s = this.states[e];
+        if (!s)
+          return;
+        if (t.hue !== void 0 && (s.hue = Math.max(0, Math.min(360, t.hue))), t.saturation !== void 0 && (s.saturation = Math.max(0, Math.min(100, t.saturation))), t.value !== void 0 && (s.value = Math.max(0, Math.min(100, t.value))), t.alpha !== void 0) {
+          let o = Math.round(t.alpha * 10) / 10;
+          s.alpha = Math.max(0.1, Math.min(0.9, o));
+        }
+        const n = this.hsvToRgb(s.hue, s.saturation, s.value), i = `rgba(${n.r}, ${n.g}, ${n.b}, ${s.alpha})`, a = this.rgbToHex(n.r, n.g, n.b);
+        this.setColor(e, s.alpha < 1 ? i : a), this.updateSaturationBackground(e), this.updateCursors(e);
+      },
+      /**
+       * 更新颜色盘背景
+       * @param {string} pickerId - 选择器ID
+       */
+      updateSaturationBackground(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        const s = this.states[e];
+        if (!s)
+          return;
+        const n = this.hsvToRgb(s.hue, 100, 100), i = this.rgbToHex(n.r, n.g, n.b), a = t.querySelector(".t-color-saturation");
+        a && (a.style.background = `linear-gradient(to right, white, ${i}), linear-gradient(to top, black, transparent)`, a.style.backgroundBlendMode = "multiply");
+        const o = t.querySelector(".t-color-alpha-bg");
+        o && (o.style.backgroundImage = `linear-gradient(to right, rgba(${n.r}, ${n.g}, ${n.b}, 0.2), rgba(${n.r}, ${n.g}, ${n.b}, 0.8))`);
+      },
+      /**
+       * 更新光标位置
+       * @param {string} pickerId - 选择器ID
+       */
+      updateCursors(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        const s = this.states[e];
+        if (!s)
+          return;
+        const n = t.querySelector(".t-color-saturation"), i = t.querySelector(".t-color-cursor");
+        if (n && i) {
+          const d = n.getBoundingClientRect();
+          i.style.left = s.saturation / 100 * d.width + "px", i.style.top = (1 - s.value / 100) * d.height + "px";
+        }
+        const a = t.querySelector(".t-color-hue-slider"), o = t.querySelector(".t-color-hue-thumb");
+        if (a && o) {
+          const d = a.getBoundingClientRect();
+          o.style.top = s.hue / 360 * d.height + "px";
+        }
+        const l = t.querySelector(".t-color-alpha-slider"), c = t.querySelector(".t-color-alpha-thumb");
+        if (l && c) {
+          const d = l.getBoundingClientRect(), m = 0.1, r = 0.9, f = (s.alpha - m) / (r - m) * (d.width - 14) + 3;
+          c.style.left = f + "px";
+        }
+      },
+      /**
+       * HSV转RGB
+       * @param {number} h - 色相 (0-360)
+       * @param {number} s - 饱和度 (0-100)
+       * @param {number} v - 明度 (0-100)
+       * @returns {Object} RGB颜色
+       */
+      hsvToRgb(e, t, s) {
+        t /= 100, s /= 100;
+        const n = s * t, i = n * (1 - Math.abs(e / 60 % 2 - 1)), a = s - n;
+        let o, l, c;
+        return e >= 0 && e < 60 ? (o = n, l = i, c = 0) : e >= 60 && e < 120 ? (o = i, l = n, c = 0) : e >= 120 && e < 180 ? (o = 0, l = n, c = i) : e >= 180 && e < 240 ? (o = 0, l = i, c = n) : e >= 240 && e < 300 ? (o = i, l = 0, c = n) : (o = n, l = 0, c = i), {
+          r: Math.round((o + a) * 255),
+          g: Math.round((l + a) * 255),
+          b: Math.round((c + a) * 255)
+        };
+      },
+      /**
+       * RGB转HEX
+       * @param {number} r - 红色 (0-255)
+       * @param {number} g - 绿色 (0-255)
+       * @param {number} b - 蓝色 (0-255)
+       * @returns {string} HEX颜色
+       */
+      rgbToHex(e, t, s) {
+        return "#" + [e, t, s].map((n) => {
+          const i = n.toString(16);
+          return i.length === 1 ? "0" + i : i;
+        }).join("");
+      },
+      /**
+       * 设置颜色
+       * @param {string} pickerId - 选择器ID
+       * @param {string} color - 颜色值
+       */
+      setColor(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-color-block, .t-color-picker__color-inner"), i = s.querySelector(".t-color-value, .t-color-picker__value"), a = s.querySelector(".t-color-input-group input, .t-color-picker__input");
+        n && (n.style.backgroundColor = t), i && (i.textContent = t), a && (a.value = t), s.dispatchEvent(new CustomEvent("t:color:change", {
+          detail: { color: t }
+        }));
+      }
+    }, ue = {
+      current: "light",
+      /**
+       * 切换主题
+       * @param {string} theme - 主题名称 (light/dark)
+       */
+      set(e) {
+        e === "dark" ? (document.documentElement.setAttribute("data-theme", "dark"), this.current = "dark") : (document.documentElement.removeAttribute("data-theme"), this.current = "light");
+        try {
+          localStorage.setItem("tbeui-theme", e);
+        } catch {
+        }
+        document.dispatchEvent(new CustomEvent("tbeui:theme:change", {
+          detail: { theme: e }
+        }));
+      },
+      /**
+       * 切换主题
+       */
+      toggle() {
+        this.set(this.current === "light" ? "dark" : "light");
+      },
+      /**
+       * 初始化主题
+       */
+      init() {
+        let e = null;
+        try {
+          e = localStorage.getItem("tbeui-theme");
+        } catch {
+        }
+        e || (e = "light"), this.set(e);
+      }
+    }, $ = {
+      /**
+       * 存储级联选择器状态
+       */
+      states: {},
+      /**
+       * 切换级联选择器（兼容旧版调用方式）
+       * @param {string} cascaderId - 级联选择器ID
+       */
+      toggleCascader(e) {
+        this.toggle(e);
+      },
+      /**
+       * 选择第一级（兼容旧版调用方式）
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {string} value - 选项值
+       * @param {string} label - 选项标签
+       */
+      selectCascaderLevel1(e, t, s) {
+        this.selectLevel1(e, t, s);
+      },
+      /**
+       * 选择第二级（兼容旧版调用方式）
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {string} parentKey - 父级Key
+       * @param {string} key - Key
+       * @param {string} name - 名称
+       * @param {string} fullPath - 完整路径
+       */
+      selectCascaderLevel2(e, t, s, n, i) {
+        this.selectLevel2(e, s, n);
+      },
+      /**
+       * 最终选择（兼容旧版调用方式）
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {string} fullPath - 完整路径
+       */
+      selectCascaderFinal(e, t) {
+        const s = t.split(" / "), n = s.map((a, o) => `level${o + 1}`);
+        this.setValue(e, n, s);
+        const i = document.getElementById(e);
+        i && (i.classList.remove("is-open"), i.setAttribute("aria-expanded", "false"), i.dispatchEvent(new CustomEvent("t:cascader:select", {
+          detail: { value: n, label: s }
+        })));
+      },
+      /**
+       * 清空选择（兼容旧版调用方式）
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {Event} event - 事件对象
+       */
+      clearCascader(e, t) {
+        this.clear(e, t);
+      },
+      /**
+       * 切换级联选择器
+       * @param {string} cascaderId - 级联选择器ID
+       */
+      toggle(e) {
+        const t = document.getElementById(e);
+        if (!t || t.classList.contains("is-disabled"))
+          return;
+        const s = t.classList.contains("is-open");
+        document.querySelectorAll(".t-cascader.is-open").forEach((n) => {
+          n.id !== e && (n.classList.remove("is-open"), n.setAttribute("aria-expanded", "false"));
+        }), t.classList.toggle("is-open"), t.setAttribute("aria-expanded", (!s).toString()), s || (this.states[e] || (this.states[e] = {
+          selectedPath: [],
+          selectedLabels: []
+        }), setTimeout(() => {
+          const n = (i) => {
+            t.contains(i.target) || (t.classList.remove("is-open"), t.setAttribute("aria-expanded", "false"), document.removeEventListener("click", n));
+          };
+          document.addEventListener("click", n);
+        }, 0));
+      },
+      /**
+       * 选择第一级
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {string} value - 选项值
+       * @param {string} label - 选项标签
+       */
+      selectLevel1(e, t, s) {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        const i = this.states[e] || { selectedPath: [], selectedLabels: [] };
+        i.selectedPath = [t], i.selectedLabels = [s], this.states[e] = i;
+        const a = n.querySelector(".t-cascader__menu:first-child");
+        a && a.querySelectorAll(".t-cascader__option").forEach((l) => {
+          const c = l.dataset.value === t;
+          l.classList.toggle("is-active", c);
+        });
+        const o = this.getLevel2Data(t);
+        this.renderLevel2Menu(e, o), n.dispatchEvent(new CustomEvent("t:cascader:change", {
+          detail: { value: i.selectedPath, label: i.selectedLabels }
+        }));
+      },
+      /**
+       * 获取二级菜单数据
+       * @param {string} parentValue - 父级值
+       * @returns {Array} 二级菜单数据
+       */
+      getLevel2Data(e) {
+        return {
+          guide: [
+            { value: "design", label: "设计原则" },
+            { value: "nav", label: "导航" }
+          ],
+          component: [
+            { value: "basic", label: "基础组件" },
+            { value: "form", label: "表单组件" }
+          ]
+        }[e] || [];
+      },
+      /**
+       * 渲染二级菜单
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {Array} data - 二级菜单数据
+       */
+      renderLevel2Menu(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-cascader__dropdown");
+        if (!n)
+          return;
+        const i = n.querySelector(".t-cascader__menu--level2");
+        if (i && i.remove(), !t || t.length === 0)
+          return;
+        const a = document.createElement("div");
+        a.className = "t-cascader__menu t-cascader__menu--level2", t.forEach((o) => {
+          const l = document.createElement("div");
+          l.className = "t-cascader__option", l.dataset.value = o.value, l.innerHTML = `${o.label}<span class="t-cascader__option-arrow">▶</span>`, l.onclick = () => this.selectLevel2(e, o.value, o.label), a.appendChild(l);
+        }), n.appendChild(a);
+      },
+      /**
+       * 选择第二级
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {string} value - 选项值
+       * @param {string} label - 选项标签
+       */
+      selectLevel2(e, t, s) {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        const i = this.states[e] || { selectedPath: [], selectedLabels: [] };
+        i.selectedPath[1] = t, i.selectedLabels[1] = s, this.states[e] = i;
+        const a = n.querySelector(".t-cascader__menu--level2");
+        a && a.querySelectorAll(".t-cascader__option").forEach((c) => {
+          const d = c.dataset.value === t;
+          c.classList.toggle("is-active", d);
+        });
+        const o = i.selectedPath[0], l = this.getLevel3Data(o, t);
+        this.renderLevel3Menu(e, l), n.dispatchEvent(new CustomEvent("t:cascader:change", {
+          detail: { value: i.selectedPath, label: i.selectedLabels }
+        }));
+      },
+      /**
+       * 获取三级菜单数据
+       * @param {string} parentValue - 父级值
+       * @param {string} value - 当前值
+       * @returns {Array} 三级菜单数据
+       */
+      getLevel3Data(e, t) {
+        const s = {
+          guide: {
+            design: [
+              { value: "consistent", label: "一致" },
+              { value: "feedback", label: "反馈" },
+              { value: "efficiency", label: "效率" }
+            ],
+            nav: [
+              { value: "top", label: "顶部导航" },
+              { value: "side", label: "侧边导航" }
+            ]
+          },
+          component: {
+            basic: [
+              { value: "button", label: "Button 按钮" },
+              { value: "icon", label: "Icon 图标" }
+            ],
+            form: [
+              { value: "input", label: "Input 输入框" },
+              { value: "select", label: "Select 选择器" }
+            ]
+          }
+        };
+        return s[e] && s[e][t] || [];
+      },
+      /**
+       * 渲染三级菜单
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {Array} data - 三级菜单数据
+       */
+      renderLevel3Menu(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-cascader__dropdown");
+        if (!n)
+          return;
+        const i = n.querySelector(".t-cascader__menu--level3");
+        if (i && i.remove(), !t || t.length === 0)
+          return;
+        const a = document.createElement("div");
+        a.className = "t-cascader__menu t-cascader__menu--level3", t.forEach((o) => {
+          const l = document.createElement("div");
+          l.className = "t-cascader__option", l.dataset.value = o.value, l.textContent = o.label, l.onclick = () => this.selectLevel3(e, o.value, o.label), a.appendChild(l);
+        }), n.appendChild(a);
+      },
+      /**
+       * 选择第三级（最终选择）
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {string} value - 选项值
+       * @param {string} label - 选项标签
+       */
+      selectLevel3(e, t, s) {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        const i = this.states[e] || { selectedPath: [], selectedLabels: [] };
+        i.selectedPath[2] = t, i.selectedLabels[2] = s, this.states[e] = i;
+        const a = document.getElementById(e + "-input");
+        a && (a.value = i.selectedLabels.join(" / "), a.setAttribute("data-value", i.selectedPath.join(","))), n.classList.remove("is-open"), n.setAttribute("aria-expanded", "false"), n.dispatchEvent(new CustomEvent("t:cascader:select", {
+          detail: { value: i.selectedPath, label: i.selectedLabels }
+        }));
+      },
+      /**
+       * 清空选择
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {Event} event - 事件对象
+       */
+      clear(e, t) {
+        t && t.stopPropagation();
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        this.states[e] = { selectedPath: [], selectedLabels: [] };
+        const n = document.getElementById(e + "-input");
+        n && (n.value = "", n.removeAttribute("data-value")), s.querySelectorAll(".t-cascader__option.is-active").forEach((i) => {
+          i.classList.remove("is-active");
+        }), s.dispatchEvent(new CustomEvent("t:cascader:clear"));
+      },
+      /**
+       * 设置值
+       * @param {string} cascaderId - 级联选择器ID
+       * @param {Array} values - 值数组
+       * @param {Array} labels - 标签数组
+       */
+      setValue(e, t, s) {
+        this.states[e] = {
+          selectedPath: t,
+          selectedLabels: s
+        };
+        const n = document.getElementById(e + "-input");
+        n && (n.value = s.join(" / "), n.setAttribute("data-value", t.join(",")));
+      },
+      /**
+       * 获取值
+       * @param {string} cascaderId - 级联选择器ID
+       * @returns {Object} 选中的值和标签
+       */
+      getValue(e) {
+        const t = this.states[e] || { selectedPath: [], selectedLabels: [] };
+        return {
+          value: t.selectedPath,
+          label: t.selectedLabels
+        };
+      }
+    }, _ = {
+      /**
+       * 存储时间选择器状态
+       */
+      states: {},
+      currentPicker: null,
+      /**
+       * 切换时间选择器
+       * @param {string} pickerId - 选择器ID
+       */
+      toggle(e) {
+        const t = document.getElementById(e);
+        if (!t || t.classList.contains("is-disabled"))
+          return;
+        document.querySelectorAll(".t-time-picker.is-open").forEach((n) => {
+          n.id !== e && (n.classList.remove("is-open"), n.setAttribute("aria-expanded", "false"));
+        });
+        const s = t.classList.contains("is-open");
+        t.classList.toggle("is-open"), t.setAttribute("aria-expanded", (!s).toString()), s ? this.currentPicker = null : (this.currentPicker = e, this.states[e] || (this.states[e] = {
+          selectedHour: "00",
+          selectedMinute: "00",
+          selectedSecond: "00"
+        }), setTimeout(() => {
+          const n = (i) => {
+            t.contains(i.target) || (t.classList.remove("is-open"), t.setAttribute("aria-expanded", "false"), this.currentPicker = null, document.removeEventListener("click", n));
+          };
+          document.addEventListener("click", n);
+        }, 0));
+      },
+      /**
+       * 选择时间（完整时间）
+       * @param {string} pickerId - 选择器ID
+       * @param {string} time - 时间字符串 (HH:mm)
+       */
+      selectTime(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const n = document.getElementById(e + "-input");
+        n && (n.value = t);
+        const i = s.querySelector(".t-time-picker__panel");
+        i && i.querySelectorAll(".t-time-picker__item").forEach((o) => {
+          o.classList.toggle("is-selected", o.textContent === t);
+        });
+        const a = t.split(":");
+        a.length >= 2 && (this.states[e] = {
+          selectedHour: a[0],
+          selectedMinute: a[1],
+          selectedSecond: a[2] || "00"
+        }), s.dispatchEvent(new CustomEvent("t:time:change", {
+          detail: { time: t }
+        }));
+      },
+      /**
+       * 选择小时
+       * @param {string} pickerId - 选择器ID
+       * @param {string} hour - 小时
+       */
+      selectHour(e, t) {
+        const s = this.states[e] || { selectedHour: "00", selectedMinute: "00" };
+        s.selectedHour = t, this.states[e] = s;
+        const n = document.getElementById(e), i = n == null ? void 0 : n.querySelectorAll(".t-time-picker__column");
+        i && i.length > 0 && i[0].querySelectorAll(".t-time-picker__item").forEach((o) => {
+          o.classList.toggle("is-selected", o.textContent === t);
+        }), this._updateInput(e);
+      },
+      /**
+       * 选择分钟
+       * @param {string} pickerId - 选择器ID
+       * @param {string} minute - 分钟
+       */
+      selectMinute(e, t) {
+        const s = this.states[e] || { selectedHour: "00", selectedMinute: "00" };
+        s.selectedMinute = t, this.states[e] = s;
+        const n = document.getElementById(e), i = n == null ? void 0 : n.querySelectorAll(".t-time-picker__column");
+        i && i.length >= 3 && i[2].querySelectorAll(".t-time-picker__item").forEach((o) => {
+          o.classList.toggle("is-selected", o.textContent === t);
+        }), this._updateInput(e);
+      },
+      /**
+       * 选择秒
+       * @param {string} pickerId - 选择器ID
+       * @param {string} second - 秒
+       */
+      selectSecond(e, t) {
+        const s = this.states[e] || { selectedHour: "00", selectedMinute: "00", selectedSecond: "00" };
+        s.selectedSecond = t, this.states[e] = s;
+        const n = document.getElementById(e), i = n == null ? void 0 : n.querySelector('.t-time-picker__seconds, [data-type="seconds"]');
+        i && i.querySelectorAll(".t-time-picker__item").forEach((a) => {
+          a.classList.toggle("is-selected", a.textContent === t);
+        }), this._updateInput(e);
+      },
+      /**
+       * 更新输入框
+       * @private
+       * @param {string} pickerId - 选择器ID
+       */
+      _updateInput(e) {
+        const t = this.states[e] || { selectedHour: "00", selectedMinute: "00" }, s = t.selectedHour + ":" + t.selectedMinute, n = document.getElementById(e + "-input");
+        n && (n.value = s);
+        const i = document.getElementById(e);
+        i == null || i.dispatchEvent(new CustomEvent("t:time:change", {
+          detail: { time: s, hour: t.selectedHour, minute: t.selectedMinute }
+        }));
+      },
+      /**
+       * 确认选择
+       * @param {string} pickerId - 选择器ID
+       */
+      confirm(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        t.classList.remove("is-open"), t.setAttribute("aria-expanded", "false"), this.currentPicker = null;
+        const s = this.states[e] || {};
+        t.dispatchEvent(new CustomEvent("t:time:confirm", {
+          detail: {
+            time: s.selectedHour + ":" + s.selectedMinute,
+            hour: s.selectedHour,
+            minute: s.selectedMinute
+          }
+        }));
+      },
+      /**
+       * 取消选择
+       * @param {string} pickerId - 选择器ID
+       */
+      cancel(e) {
+        const t = document.getElementById(e);
+        t && (t.classList.remove("is-open"), t.setAttribute("aria-expanded", "false"), this.currentPicker = null, t.dispatchEvent(new CustomEvent("t:time:cancel")));
+      },
+      /**
+       * 设置值
+       * @param {string} pickerId - 选择器ID
+       * @param {string} time - 时间字符串 (HH:mm:ss)
+       */
+      setValue(e, t) {
+        const s = t.split(":");
+        this.states[e] = {
+          selectedHour: s[0] || "00",
+          selectedMinute: s[1] || "00",
+          selectedSecond: s[2] || "00"
+        };
+        const n = document.getElementById(e + "-input");
+        n && (n.value = t);
+      },
+      /**
+       * 获取值
+       * @param {string} pickerId - 选择器ID
+       * @returns {string} 时间字符串
+       */
+      getValue(e) {
+        const t = this.states[e] || { selectedHour: "00", selectedMinute: "00" };
+        return t.selectedHour + ":" + t.selectedMinute;
+      }
+    }, z = {
+      /**
+       * 存储日期选择器状态
+       */
+      states: {},
+      currentPicker: null,
+      /**
+       * 切换日期选择器
+       * @param {string} pickerId - 选择器ID
+       */
+      toggle(e) {
+        const t = document.getElementById(e);
+        if (!t || t.classList.contains("is-disabled"))
+          return;
+        document.querySelectorAll(".t-date-picker.is-open").forEach((n) => {
+          n.id !== e && (n.classList.remove("is-open"), n.setAttribute("aria-expanded", "false"));
+        });
+        const s = t.classList.contains("is-open");
+        if (t.classList.toggle("is-open"), t.setAttribute("aria-expanded", (!s).toString()), s)
+          this.currentPicker = null;
+        else {
+          this.currentPicker = e;
+          const n = t.classList.contains("is-range");
+          this.states[e] ? this.states[e].isRange = n : this.states[e] = {
+            currentDate: /* @__PURE__ */ new Date(),
+            selectedDate: null,
+            selectedEndDate: null,
+            isRange: n,
+            selectingStart: !0
+            // 范围选择时，true表示正在选择开始日期
+          }, this.render(e), setTimeout(() => {
+            const i = (a) => {
+              t.contains(a.target) || (t.classList.remove("is-open"), t.setAttribute("aria-expanded", "false"), this.currentPicker = null, document.removeEventListener("click", i));
+            };
+            document.addEventListener("click", i);
+          }, 0);
+        }
+      },
+      /**
+       * 渲染日历
+       * @param {string} pickerId - 选择器ID
+       */
+      render(e) {
+        if (!document.getElementById(e))
+          return;
+        const s = this.states[e];
+        if (!s)
+          return;
+        const n = s.currentDate.getFullYear(), i = s.currentDate.getMonth(), a = document.getElementById(e + "-header");
+        a && (a.textContent = n + "年 " + (i + 1) + "月");
+        const o = new Date(n, i, 1), c = new Date(n, i + 1, 0).getDate(), d = o.getDay(), m = new Date(n, i, 0).getDate(), r = document.getElementById(e + "-days");
+        if (!r)
+          return;
+        r.innerHTML = "";
+        for (let u = d - 1; u >= 0; u--) {
+          const g = m - u, p = this._createDayElement(g, !0);
+          r.appendChild(p);
+        }
+        const h = /* @__PURE__ */ new Date();
+        for (let u = 1; u <= c; u++) {
+          const g = n === h.getFullYear() && i === h.getMonth() && u === h.getDate(), p = s.selectedDate && n === s.selectedDate.getFullYear() && i === s.selectedDate.getMonth() && u === s.selectedDate.getDate(), v = s.isRange && s.selectedEndDate && n === s.selectedEndDate.getFullYear() && i === s.selectedEndDate.getMonth() && u === s.selectedEndDate.getDate(), w = s.isRange && s.selectedDate && s.selectedEndDate && !s.selectingStart && new Date(n, i, u) > s.selectedDate && new Date(n, i, u) < s.selectedEndDate, k = this._createDayElement(u, !1, g, p || v, e, w);
+          r.appendChild(k);
+        }
+        const f = 42 - (d + c);
+        for (let u = 1; u <= f; u++) {
+          const g = this._createDayElement(u, !0);
+          r.appendChild(g);
+        }
+      },
+      /**
+       * 创建日期元素
+       * @private
+       * @param {number} day - 日期
+       * @param {boolean} isOtherMonth - 是否其他月份
+       * @param {boolean} isToday - 是否今天
+       * @param {boolean} isSelected - 是否选中
+       * @param {string} pickerId - 选择器ID
+       * @param {boolean} isInRange - 是否在范围内（范围选择模式）
+       * @returns {HTMLElement} 日期元素
+       */
+      _createDayElement(e, t, s = !1, n = !1, i = null, a = !1) {
+        const o = document.createElement("div");
+        o.className = "t-date-picker__day";
+        const l = document.createElement("span");
+        return l.className = "t-date-picker__day-number", l.textContent = e, o.appendChild(l), t && o.classList.add("is-other-month"), s && o.classList.add("is-today"), n && o.classList.add("is-selected"), a && o.classList.add("is-in-range"), i && !t && o.addEventListener("click", (c) => {
+          c.stopPropagation(), this.selectDate(i, e);
+        }), o;
+      },
+      /**
+       * 选择日期
+       * @param {string} pickerId - 选择器ID
+       * @param {number} day - 日期
+       */
+      selectDate(e, t) {
+        const s = this.states[e];
+        if (!s)
+          return;
+        const n = new Date(s.currentDate.getFullYear(), s.currentDate.getMonth(), t), i = document.getElementById(e);
+        if (s.isRange)
+          if (s.selectingStart) {
+            s.selectedDate = n, s.selectingStart = !1;
+            const o = document.getElementById(e + "-start");
+            if (o) {
+              const l = n.getFullYear(), c = String(n.getMonth() + 1).padStart(2, "0"), d = String(t).padStart(2, "0");
+              o.value = l + "-" + c + "-" + d;
+            }
+            this.render(e), i.dispatchEvent(new CustomEvent("t:date:start-change", {
+              detail: { date: n }
+            }));
+            return;
+          } else {
+            if (s.selectedEndDate = n, s.selectingStart = !0, s.selectedDate && n < s.selectedDate) {
+              const l = s.selectedDate;
+              s.selectedDate = n, s.selectedEndDate = l;
+            }
+            const o = document.getElementById(e + "-end");
+            if (o) {
+              const l = s.selectedEndDate.getFullYear(), c = String(s.selectedEndDate.getMonth() + 1).padStart(2, "0"), d = String(s.selectedEndDate.getDate()).padStart(2, "0");
+              o.value = l + "-" + c + "-" + d;
+            }
+            this.render(e), i.classList.remove("is-open"), i.setAttribute("aria-expanded", "false"), this.currentPicker = null, i.dispatchEvent(new CustomEvent("t:date:range-change", {
+              detail: {
+                startDate: s.selectedDate,
+                endDate: s.selectedEndDate
+              }
+            }));
+            return;
+          }
+        s.selectedDate = n;
+        const a = document.getElementById(e + "-start") || document.getElementById(e + "-input");
+        if (a) {
+          const o = s.selectedDate.getFullYear(), l = String(s.selectedDate.getMonth() + 1).padStart(2, "0"), c = String(t).padStart(2, "0");
+          a.value = o + "-" + l + "-" + c;
+        }
+        this.render(e), i.classList.remove("is-open"), i.setAttribute("aria-expanded", "false"), this.currentPicker = null, i.dispatchEvent(new CustomEvent("t:date:change", {
+          detail: { date: s.selectedDate }
+        }));
+      },
+      /**
+       * 切换月份
+       * @param {string} pickerId - 选择器ID
+       * @param {number} delta - 月份变化量
+       */
+      changeMonth(e, t) {
+        const s = this.states[e];
+        s && (s.currentDate.setMonth(s.currentDate.getMonth() + t), this.render(e));
+      },
+      /**
+       * 选择快捷选项
+       * @param {string} pickerId - 选择器ID
+       * @param {string} type - 快捷类型 (today, yesterday, week)
+       */
+      selectShortcut(e, t) {
+        const s = /* @__PURE__ */ new Date();
+        let n = new Date(s);
+        switch (t) {
+          case "today":
+            break;
+          case "yesterday":
+            n.setDate(s.getDate() - 1);
+            break;
+          case "week":
+            n.setDate(s.getDate() - 7);
+            break;
+        }
+        const i = this.states[e];
+        if (!i)
+          return;
+        i.currentDate = new Date(n.getFullYear(), n.getMonth(), 1), i.selectedDate = n;
+        const a = document.getElementById(e + "-start") || document.getElementById(e + "-input");
+        if (a) {
+          const l = n.getFullYear(), c = String(n.getMonth() + 1).padStart(2, "0"), d = String(n.getDate()).padStart(2, "0");
+          a.value = l + "-" + c + "-" + d;
+        }
+        this.render(e);
+        const o = document.getElementById(e);
+        o.classList.remove("is-open"), o.setAttribute("aria-expanded", "false"), this.currentPicker = null, o.dispatchEvent(new CustomEvent("t:date:change", {
+          detail: { date: n }
+        }));
+      },
+      /**
+       * 设置值
+       * @param {string} pickerId - 选择器ID
+       * @param {Date|string} date - 日期
+       */
+      setValue(e, t) {
+        const s = typeof t == "string" ? new Date(t) : t;
+        this.states[e] = {
+          currentDate: new Date(s.getFullYear(), s.getMonth(), 1),
+          selectedDate: s
+        };
+        const n = document.getElementById(e + "-input");
+        if (n) {
+          const i = s.getFullYear(), a = String(s.getMonth() + 1).padStart(2, "0"), o = String(s.getDate()).padStart(2, "0");
+          n.value = i + "-" + a + "-" + o;
+        }
+      },
+      /**
+       * 获取值
+       * @param {string} pickerId - 选择器ID
+       * @returns {Date|null} 选中的日期
+       */
+      getValue(e) {
+        const t = this.states[e];
+        return t ? t.selectedDate : null;
+      }
+    }, x = {
+      /**
+       * 存储日期时间选择器状态
+       */
+      states: {},
+      currentPicker: null,
+      /**
+       * 切换日期时间选择器
+       * @param {string} pickerId - 选择器ID
+       */
+      toggle(e) {
+        const t = document.getElementById(e);
+        if (!t || t.classList.contains("is-disabled"))
+          return;
+        document.querySelectorAll(".t-datetime-picker.is-open").forEach((n) => {
+          n.id !== e && (n.classList.remove("is-open"), n.setAttribute("aria-expanded", "false"));
+        });
+        const s = t.classList.contains("is-open");
+        if (t.classList.toggle("is-open"), t.setAttribute("aria-expanded", (!s).toString()), s)
+          this.currentPicker = null;
+        else {
+          this.currentPicker = e;
+          const n = t.classList.contains("t-datetime-picker--range");
+          this.states[e] || (this.states[e] = {
+            currentDate: /* @__PURE__ */ new Date(),
+            selectedDate: null,
+            selectedEndDate: null,
+            isRange: n,
+            selectingStart: !0,
+            selectedHour: "09",
+            selectedMinute: "00"
+          }), this.render(e), setTimeout(() => {
+            const i = (a) => {
+              t.contains(a.target) || (t.classList.remove("is-open"), t.setAttribute("aria-expanded", "false"), this.currentPicker = null, document.removeEventListener("click", i));
+            };
+            document.addEventListener("click", i);
+          }, 0);
+        }
+      },
+      /**
+       * 渲染日历
+       * @param {string} pickerId - 选择器ID
+       */
+      render(e) {
+        if (!document.getElementById(e))
+          return;
+        const s = this.states[e];
+        if (!s)
+          return;
+        const n = s.currentDate.getFullYear(), i = s.currentDate.getMonth(), a = document.getElementById(e + "-header");
+        a && (a.textContent = n + "年 " + (i + 1) + "月");
+        const o = new Date(n, i, 1), c = new Date(n, i + 1, 0).getDate(), d = o.getDay(), m = new Date(n, i, 0).getDate(), r = document.getElementById(e + "-days");
+        if (!r)
+          return;
+        r.innerHTML = "";
+        for (let u = d - 1; u >= 0; u--) {
+          const g = m - u, p = this._createDayElement(g, !0);
+          r.appendChild(p);
+        }
+        const h = /* @__PURE__ */ new Date();
+        for (let u = 1; u <= c; u++) {
+          const g = n === h.getFullYear() && i === h.getMonth() && u === h.getDate(), p = s.selectedDate && n === s.selectedDate.getFullYear() && i === s.selectedDate.getMonth() && u === s.selectedDate.getDate(), v = s.isRange && s.selectedEndDate && n === s.selectedEndDate.getFullYear() && i === s.selectedEndDate.getMonth() && u === s.selectedEndDate.getDate(), w = s.isRange && s.selectedDate && s.selectedEndDate && !s.selectingStart && new Date(n, i, u) > s.selectedDate && new Date(n, i, u) < s.selectedEndDate, k = this._createDayElement(u, !1, g, p || v, e, w);
+          r.appendChild(k);
+        }
+        const f = 42 - (d + c);
+        for (let u = 1; u <= f; u++) {
+          const g = this._createDayElement(u, !0);
+          r.appendChild(g);
+        }
+      },
+      /**
+       * 创建日期元素
+       * @private
+       * @param {number} day - 日期
+       * @param {boolean} isOtherMonth - 是否其他月份
+       * @param {boolean} isToday - 是否今天
+       * @param {boolean} isSelected - 是否选中
+       * @param {string} pickerId - 选择器ID
+       * @param {boolean} isInRange - 是否在范围内
+       * @returns {HTMLElement} 日期元素
+       */
+      _createDayElement(e, t, s = !1, n = !1, i = null, a = !1) {
+        const o = document.createElement("div");
+        o.className = "t-date-picker__day";
+        const l = document.createElement("span");
+        return l.className = "t-date-picker__day-number", l.textContent = e, o.appendChild(l), t && o.classList.add("is-other-month"), s && o.classList.add("is-today"), n && o.classList.add("is-selected"), a && o.classList.add("is-in-range"), i && !t && o.addEventListener("click", (c) => {
+          c.stopPropagation(), this.selectDate(i, e);
+        }), o;
+      },
+      /**
+       * 选择日期
+       * @param {string} pickerId - 选择器ID
+       * @param {number} day - 日期
+       */
+      selectDate(e, t) {
+        const s = this.states[e];
+        if (!s)
+          return;
+        const n = new Date(s.currentDate.getFullYear(), s.currentDate.getMonth(), t);
+        if (s.isRange)
+          if (s.selectingStart) {
+            s.selectedDate = n, s.selectingStart = !1;
+            const a = document.getElementById(e + "-start");
+            if (a) {
+              const o = n.getFullYear(), l = String(n.getMonth() + 1).padStart(2, "0"), c = String(t).padStart(2, "0");
+              a.value = o + "-" + l + "-" + c;
+            }
+            setTimeout(() => {
+              this.render(e);
+            }, 0);
+            return;
+          } else {
+            if (s.selectedEndDate = n, s.selectingStart = !0, s.selectedDate && n < s.selectedDate) {
+              const l = s.selectedDate;
+              s.selectedDate = n, s.selectedEndDate = l;
+            }
+            const a = document.getElementById(e + "-end");
+            if (a) {
+              const l = s.selectedEndDate.getFullYear(), c = String(s.selectedEndDate.getMonth() + 1).padStart(2, "0"), d = String(s.selectedEndDate.getDate()).padStart(2, "0");
+              a.value = l + "-" + c + "-" + d;
+            }
+            const o = document.getElementById(e);
+            o && (o.classList.remove("is-open"), o.setAttribute("aria-expanded", "false")), this.currentPicker = null;
+            return;
+          }
+        s.selectedDate = n;
+        const i = document.getElementById(e + "-input");
+        if (i) {
+          const a = n.getFullYear(), o = String(n.getMonth() + 1).padStart(2, "0"), l = String(t).padStart(2, "0");
+          i.value = a + "-" + o + "-" + l;
+        }
+        setTimeout(() => {
+          this.render(e);
+        }, 0);
+      },
+      /**
+       * 选择小时
+       * @param {string} pickerId - 选择器ID
+       * @param {string} hour - 小时
+       */
+      selectHour(e, t) {
+        const s = this.states[e];
+        if (!s)
+          return;
+        s.selectedHour = t;
+        const n = document.getElementById(e + "-hours");
+        n && n.querySelectorAll(".t-datetime-picker__time-item").forEach((i) => {
+          i.classList.toggle("is-selected", i.textContent === t);
+        });
+      },
+      /**
+       * 选择分钟
+       * @param {string} pickerId - 选择器ID
+       * @param {string} minute - 分钟
+       */
+      selectMinute(e, t) {
+        const s = this.states[e];
+        if (!s)
+          return;
+        s.selectedMinute = t;
+        const n = document.getElementById(e + "-minutes");
+        n && n.querySelectorAll(".t-datetime-picker__time-item").forEach((i) => {
+          i.classList.toggle("is-selected", i.textContent === t);
+        });
+      },
+      /**
+       * 确认选择
+       * @param {string} pickerId - 选择器ID
+       */
+      confirm(e) {
+        const t = this.states[e];
+        if (!t)
+          return;
+        if (t.selectedDate) {
+          const n = t.selectedDate.getFullYear(), i = String(t.selectedDate.getMonth() + 1).padStart(2, "0"), a = String(t.selectedDate.getDate()).padStart(2, "0"), o = t.selectedHour + ":" + t.selectedMinute, l = document.getElementById(e + "-input");
+          l && (l.value = n + "-" + i + "-" + a + " " + o), document.getElementById(e).dispatchEvent(new CustomEvent("t:datetime:confirm", {
+            detail: {
+              date: t.selectedDate,
+              time: o,
+              datetime: n + "-" + i + "-" + a + " " + o
+            }
+          }));
+        }
+        const s = document.getElementById(e);
+        s.classList.remove("is-open"), s.setAttribute("aria-expanded", "false"), this.currentPicker = null;
+      },
+      /**
+       * 取消选择
+       * @param {string} pickerId - 选择器ID
+       */
+      cancel(e) {
+        const t = document.getElementById(e);
+        t && (t.classList.remove("is-open"), t.setAttribute("aria-expanded", "false"), this.currentPicker = null, t.dispatchEvent(new CustomEvent("t:datetime:cancel")));
+      },
+      /**
+       * 切换月份
+       * @param {string} pickerId - 选择器ID
+       * @param {number} delta - 月份变化量
+       */
+      changeMonth(e, t) {
+        const s = this.states[e];
+        s && (s.currentDate.setMonth(s.currentDate.getMonth() + t), this.render(e));
+      },
+      /**
+       * 设置值
+       * @param {string} pickerId - 选择器ID
+       * @param {Date|string} datetime - 日期时间
+       */
+      setValue(e, t) {
+        const s = typeof t == "string" ? new Date(t) : t;
+        this.states[e] = {
+          currentDate: new Date(s.getFullYear(), s.getMonth(), 1),
+          selectedDate: s,
+          selectedHour: String(s.getHours()).padStart(2, "0"),
+          selectedMinute: String(s.getMinutes()).padStart(2, "0")
+        };
+        const n = document.getElementById(e + "-input");
+        if (n) {
+          const i = s.getFullYear(), a = String(s.getMonth() + 1).padStart(2, "0"), o = String(s.getDate()).padStart(2, "0"), l = this.states[e].selectedHour + ":" + this.states[e].selectedMinute;
+          n.value = i + "-" + a + "-" + o + " " + l;
+        }
+      },
+      /**
+       * 获取值
+       * @param {string} pickerId - 选择器ID
+       * @returns {Object} 日期时间对象
+       */
+      getValue(e) {
+        const t = this.states[e];
+        return !t || !t.selectedDate ? null : {
+          date: t.selectedDate,
+          time: t.selectedHour + ":" + t.selectedMinute,
+          datetime: t.selectedDate.getFullYear() + "-" + String(t.selectedDate.getMonth() + 1).padStart(2, "0") + "-" + String(t.selectedDate.getDate()).padStart(2, "0") + " " + t.selectedHour + ":" + t.selectedMinute
+        };
+      }
+    }, he = {
+      /**
+       * 存储上传组件状态
+       */
+      states: {},
+      /**
+       * 初始化上传组件
+       */
+      init() {
+        document.querySelectorAll(".t-upload__input").forEach((e) => {
+          e.addEventListener("change", (t) => {
+            var n;
+            const s = (n = e.closest(".t-upload")) == null ? void 0 : n.id;
+            s && this.handleFileSelect(s, t.target.files);
+          });
+        }), document.querySelectorAll(".t-upload--drag").forEach((e) => {
+          const t = e.id;
+          t && (e.addEventListener("dragover", (s) => {
+            s.preventDefault(), e.classList.add("is-dragover");
+          }), e.addEventListener("dragleave", (s) => {
+            s.preventDefault(), e.classList.remove("is-dragover");
+          }), e.addEventListener("drop", (s) => {
+            s.preventDefault(), e.classList.remove("is-dragover");
+            const n = s.dataTransfer.files;
+            n.length > 0 && this.handleFileSelect(t, n);
+          }));
+        });
+      },
+      /**
+       * 处理文件选择
+       * @param {string} uploadId - 上传组件ID
+       * @param {FileList} files - 文件列表
+       */
+      handleFileSelect(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        this.states[e] || (this.states[e] = {
+          files: [],
+          fileList: []
+        });
+        const n = this.states[e], i = s.querySelector(".t-upload__file-list");
+        Array.from(t).forEach((o) => {
+          const c = {
+            id: "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9),
+            file: o,
+            name: o.name,
+            size: o.size,
+            status: "ready",
+            // ready, uploading, success, error
+            progress: 0
+          };
+          n.fileList.push(c), i && this.addFileToList(i, c, e);
+        }), s.dispatchEvent(new CustomEvent("t:upload:select", {
+          detail: { files: n.fileList }
+        }));
+        const a = s.dataset.action;
+        a && this.upload(e, a);
+      },
+      /**
+       * 添加文件到列表
+       * @param {HTMLElement} fileList - 文件列表容器
+       * @param {Object} fileItem - 文件项
+       * @param {string} uploadId - 上传组件ID
+       */
+      addFileToList(e, t, s) {
+        const n = document.createElement("li");
+        n.className = "t-upload__file-item t-border-box--inset-sm", n.dataset.fileId = t.id;
+        const i = this.formatFileSize(t.size);
+        n.innerHTML = `
+                <span class="t-upload__file-name">${t.name}</span>
+                <span class="t-upload__file-size">${i}</span>
+                <span class="t-upload__file-status">${t.status}</span>
+                <div class="t-upload__file-progress" style="display: none;">
+                    <div class="t-upload__file-progress-bar" style="width: 0%"></div>
+                </div>
+                <button class="t-upload__file-remove" onclick="TbeUI.Upload.removeFile('${s}', '${t.id}')">
+                    <i class="t-icon-close"></i>
+                </button>
+            `, e.appendChild(n);
+      },
+      /**
+       * 格式化文件大小
+       * @param {number} bytes - 字节数
+       * @returns {string} 格式化后的文件大小
+       */
+      formatFileSize(e) {
+        if (e === 0)
+          return "0 B";
+        const t = 1024, s = ["B", "KB", "MB", "GB"], n = Math.floor(Math.log(e) / Math.log(t));
+        return parseFloat((e / Math.pow(t, n)).toFixed(2)) + " " + s[n];
+      },
+      /**
+       * 移除文件
+       * @param {string} uploadId - 上传组件ID
+       * @param {string} fileId - 文件ID
+       */
+      removeFile(e, t) {
+        const s = this.states[e];
+        if (!s)
+          return;
+        const n = s.fileList.findIndex((o) => o.id === t);
+        n > -1 && s.fileList.splice(n, 1);
+        const i = document.getElementById(e), a = i == null ? void 0 : i.querySelector(`[data-file-id="${t}"]`);
+        a && a.remove(), i.dispatchEvent(new CustomEvent("t:upload:remove", {
+          detail: { fileId: t }
+        }));
+      },
+      /**
+       * 上传文件
+       * @param {string} uploadId - 上传组件ID
+       * @param {string} action - 上传地址
+       */
+      upload(e, t) {
+        const s = this.states[e];
+        if (!s || s.fileList.length === 0)
+          return;
+        const n = document.getElementById(e);
+        n == null || n.dataset.autoUpload, s.fileList.forEach((i) => {
+          if (i.status !== "ready")
+            return;
+          i.status = "uploading", this.updateFileStatus(e, i.id, "uploading");
+          const a = new FormData();
+          a.append("file", i.file);
+          const o = new XMLHttpRequest();
+          o.upload.addEventListener("progress", (l) => {
+            if (l.lengthComputable) {
+              const c = Math.round(l.loaded / l.total * 100);
+              i.progress = c, this.updateFileProgress(e, i.id, c);
+            }
+          }), o.addEventListener("load", () => {
+            o.status === 200 ? (i.status = "success", this.updateFileStatus(e, i.id, "success"), n.dispatchEvent(new CustomEvent("t:upload:success", {
+              detail: { file: i, response: o.response }
+            }))) : (i.status = "error", this.updateFileStatus(e, i.id, "error"), n.dispatchEvent(new CustomEvent("t:upload:error", {
+              detail: { file: i, error: o.statusText }
+            })));
+          }), o.addEventListener("error", () => {
+            i.status = "error", this.updateFileStatus(e, i.id, "error"), n.dispatchEvent(new CustomEvent("t:upload:error", {
+              detail: { file: i, error: "Network error" }
+            }));
+          }), o.open("POST", t), o.send(a);
+        });
+      },
+      /**
+       * 更新文件状态
+       * @param {string} uploadId - 上传组件ID
+       * @param {string} fileId - 文件ID
+       * @param {string} status - 状态
+       */
+      updateFileStatus(e, t, s) {
+        const n = document.getElementById(e), i = n == null ? void 0 : n.querySelector(`[data-file-id="${t}"]`);
+        if (!i)
+          return;
+        const a = i.querySelector(".t-upload__file-status");
+        if (a) {
+          const o = {
+            ready: "待上传",
+            uploading: "上传中",
+            success: "上传成功",
+            error: "上传失败"
+          };
+          a.textContent = o[s] || s, a.className = "t-upload__file-status is-" + s;
+        }
+      },
+      /**
+       * 更新文件进度
+       * @param {string} uploadId - 上传组件ID
+       * @param {string} fileId - 文件ID
+       * @param {number} progress - 进度百分比
+       */
+      updateFileProgress(e, t, s) {
+        const n = document.getElementById(e), i = n == null ? void 0 : n.querySelector(`[data-file-id="${t}"]`);
+        if (!i)
+          return;
+        const a = i.querySelector(".t-upload__file-progress"), o = i.querySelector(".t-upload__file-progress-bar");
+        a && o && (a.style.display = "block", o.style.width = s + "%");
+      },
+      /**
+       * 清空文件列表
+       * @param {string} uploadId - 上传组件ID
+       */
+      clearFiles(e) {
+        const t = this.states[e];
+        t && (t.fileList = []);
+        const s = document.getElementById(e), n = s == null ? void 0 : s.querySelector(".t-upload__file-list");
+        n && (n.innerHTML = "");
+        const i = s == null ? void 0 : s.querySelector(".t-upload__input");
+        i && (i.value = "");
+      },
+      /**
+       * 获取文件列表
+       * @param {string} uploadId - 上传组件ID
+       * @returns {Array} 文件列表
+       */
+      getFileList(e) {
+        const t = this.states[e];
+        return t ? t.fileList : [];
+      }
+    }, ie = {
+      /**
+       * 存储表单状态
+       */
+      states: {},
+      /**
+       * 初始化表单组件
+       */
+      init() {
+        document.querySelectorAll(".t-form").forEach((e) => {
+          const t = e.id;
+          t && (this.states[t] = {
+            fields: {},
+            errors: {},
+            rules: this.parseRules(e)
+          }, e.addEventListener("submit", (s) => {
+            s.preventDefault(), this.submit(t);
+          }), e.querySelectorAll("[data-validate]").forEach((s) => {
+            s.addEventListener("blur", () => {
+              this.validateField(t, s);
+            });
+          }));
+        });
+      },
+      /**
+       * 解析表单验证规则
+       * @param {HTMLElement} form - 表单元素
+       * @returns {Object} 验证规则
+       */
+      parseRules(e) {
+        const t = {};
+        return e.querySelectorAll("[data-validate]").forEach((s) => {
+          const n = s.name;
+          if (!n)
+            return;
+          const i = s.dataset.validate.split("|");
+          t[n] = [], i.forEach((a) => {
+            const [o, l] = a.split(":");
+            t[n].push({
+              type: o,
+              value: l,
+              message: s.dataset.message || this.getDefaultMessage(o, l)
+            });
+          });
+        }), t;
+      },
+      /**
+       * 获取默认错误消息
+       * @param {string} ruleType - 规则类型
+       * @param {string} ruleValue - 规则值
+       * @returns {string} 错误消息
+       */
+      getDefaultMessage(e, t) {
+        return {
+          required: "该字段不能为空",
+          email: "请输入有效的邮箱地址",
+          min: "长度不能少于" + t + "个字符",
+          max: "长度不能超过" + t + "个字符",
+          phone: "请输入有效的手机号码",
+          number: "请输入数字"
+        }[e] || "验证失败";
+      },
+      /**
+       * 验证单个字段
+       * @param {string} formId - 表单ID
+       * @param {HTMLElement} field - 字段元素
+       * @returns {boolean} 验证结果
+       */
+      validateField(e, t) {
+        const s = this.states[e];
+        if (!s)
+          return !0;
+        const n = t.name, i = t.value.trim(), a = s.rules[n];
+        if (!a)
+          return !0;
+        for (const o of a)
+          if (!this.checkRule(i, o))
+            return this.showError(e, t, o.message), s.errors[n] = o.message, !1;
+        return this.clearError(e, t), delete s.errors[n], !0;
+      },
+      /**
+       * 检查规则
+       * @param {string} value - 字段值
+       * @param {Object} rule - 规则对象
+       * @returns {boolean} 验证结果
+       */
+      checkRule(e, t) {
+        switch (t.type) {
+          case "required":
+            return e.length > 0;
+          case "email":
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+          case "phone":
+            return /^1[3-9]\d{9}$/.test(e);
+          case "min":
+            return e.length >= parseInt(t.value);
+          case "max":
+            return e.length <= parseInt(t.value);
+          case "number":
+            return !isNaN(e) && e !== "";
+          default:
+            return !0;
+        }
+      },
+      /**
+       * 显示错误信息
+       * @param {string} formId - 表单ID
+       * @param {HTMLElement} field - 字段元素
+       * @param {string} message - 错误消息
+       */
+      showError(e, t, s) {
+        const n = t.closest(".t-form-item");
+        if (!n)
+          return;
+        n.classList.add("is-error");
+        let i = n.querySelector(".t-form__error");
+        i || (i = document.createElement("div"), i.className = "t-form__error", n.appendChild(i)), i.textContent = s;
+      },
+      /**
+       * 清除错误信息
+       * @param {string} formId - 表单ID
+       * @param {HTMLElement} field - 字段元素
+       */
+      clearError(e, t) {
+        const s = t.closest(".t-form-item");
+        if (!s)
+          return;
+        s.classList.remove("is-error");
+        const n = s.querySelector(".t-form__error");
+        n && n.remove();
+      },
+      /**
+       * 验证整个表单
+       * @param {string} formId - 表单ID
+       * @returns {boolean} 验证结果
+       */
+      validate(e) {
+        const t = document.getElementById(e), s = this.states[e];
+        if (!t || !s)
+          return !1;
+        let n = !0;
+        return s.errors = {}, t.querySelectorAll("[data-validate]").forEach((i) => {
+          this.validateField(e, i) || (n = !1);
+        }), n;
+      },
+      /**
+       * 提交表单
+       * @param {string} formId - 表单ID
+       */
+      submit(e) {
+        if (!this.validate(e))
+          return;
+        const t = document.getElementById(e);
+        if (this.states[e], !t)
+          return;
+        const s = new FormData(t), n = {};
+        s.forEach((o, l) => {
+          n[l] = o;
+        }), t.dispatchEvent(new CustomEvent("t:form:submit", {
+          detail: { data: n }
+        }));
+        const i = t.getAttribute("action"), a = t.getAttribute("method") || "POST";
+        i && this.sendRequest(e, i, a, n);
+      },
+      /**
+       * 发送请求
+       * @param {string} formId - 表单ID
+       * @param {string} url - 请求地址
+       * @param {string} method - 请求方法
+       * @param {Object} data - 请求数据
+       */
+      sendRequest(e, t, s, n) {
+        const i = document.getElementById(e);
+        fetch(t, {
+          method: s,
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(n)
+        }).then((a) => a.json()).then((a) => {
+          i.dispatchEvent(new CustomEvent("t:form:success", {
+            detail: { result: a }
+          }));
+        }).catch((a) => {
+          i.dispatchEvent(new CustomEvent("t:form:error", {
+            detail: { error: a }
+          }));
+        });
+      },
+      /**
+       * 重置表单
+       * @param {string} formId - 表单ID
+       */
+      reset(e) {
+        const t = document.getElementById(e), s = this.states[e];
+        t && (t.reset(), s && (s.errors = {}), t.querySelectorAll(".t-form-item.is-error").forEach((n) => {
+          n.classList.remove("is-error");
+          const i = n.querySelector(".t-form__error");
+          i && i.remove();
+        }), t.dispatchEvent(new CustomEvent("t:form:reset")));
+      },
+      /**
+       * 设置字段值
+       * @param {string} formId - 表单ID
+       * @param {string} fieldName - 字段名
+       * @param {any} value - 字段值
+       */
+      setFieldValue(e, t, s) {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        const i = n.querySelector('[name="' + t + '"]');
+        i && (i.value = s);
+      },
+      /**
+       * 获取字段值
+       * @param {string} formId - 表单ID
+       * @param {string} fieldName - 字段名
+       * @returns {any} 字段值
+       */
+      getFieldValue(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return null;
+        const n = s.querySelector('[name="' + t + '"]');
+        return n ? n.value : null;
+      },
+      /**
+       * 获取表单数据
+       * @param {string} formId - 表单ID
+       * @returns {Object} 表单数据
+       */
+      getFormData(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return {};
+        const s = new FormData(t), n = {};
+        return s.forEach((i, a) => {
+          n[a] = i;
+        }), n;
+      },
+      /**
+       * 改变表单标签对齐方式
+       * @param {string} formId - 表单ID
+       * @param {string} position - 对齐方式 (left/right/top)
+       */
+      changeLabelPosition(e, t) {
+        const s = document.getElementById(e);
+        s && (s.classList.remove("t-form--label-left", "t-form--label-right", "t-form--label-top"), s.classList.add("t-form--label-" + t), s.dispatchEvent(new CustomEvent("t:form:labelPositionChange", {
+          detail: { position: t }
+        })));
+      }
+    }, G = {
+      /**
+       * 存储分页状态
+       */
+      states: {},
+      /**
+       * 创建分页组件
+       */
+      create(e, t = {}) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const {
+          total: n = 0,
+          pageSize: i = 10,
+          currentPage: a = 1,
+          pagerCount: o = 7,
+          hideOnSinglePage: l = !1,
+          disabled: c = !1,
+          background: d = !1,
+          small: m = !1,
+          onChange: r = null,
+          onSizeChange: h = null
+        } = t, f = Math.ceil(n / i);
+        if (l && f <= 1) {
+          s.style.display = "none";
+          return;
+        }
+        s.style.display = "", this.states[e] = {
+          total: n,
+          pageSize: i,
+          currentPage: a,
+          pagerCount: o,
+          hideOnSinglePage: l,
+          disabled: c,
+          background: d,
+          small: m,
+          onChange: r,
+          onSizeChange: h,
+          totalPages: f
+        }, this.render(e);
+      },
+      /**
+       * 渲染分页组件
+       */
+      render(e) {
+        const t = document.getElementById(e), s = this.states[e];
+        if (!t || !s)
+          return;
+        const { total: n, pageSize: i, currentPage: a, pagerCount: o, disabled: l, background: c, small: d, totalPages: m } = s;
+        t.innerHTML = "", t.className = "t-pagination", c && t.classList.add("t-pagination--background"), d && t.classList.add("t-pagination--small"), l && t.classList.add("is-disabled");
+        const r = document.createElement("button");
+        r.className = "t-pagination__btn t-pagination__prev", r.disabled = l || a <= 1, r.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>', r.onclick = () => this.changePage(e, a - 1), t.appendChild(r);
+        const h = document.createElement("div");
+        h.className = "t-pagination__pager", this.getPageNumbers(a, m, o).forEach((g) => {
+          if (g === "...") {
+            const p = document.createElement("span");
+            p.className = "t-pagination__ellipsis", p.textContent = "...", h.appendChild(p);
+          } else {
+            const p = document.createElement("button");
+            p.className = "t-pagination__number" + (g === a ? " active" : ""), p.textContent = g, p.disabled = l, p.onclick = () => this.changePage(e, g), h.appendChild(p);
+          }
+        }), t.appendChild(h);
+        const u = document.createElement("button");
+        if (u.className = "t-pagination__btn t-pagination__next", u.disabled = l || a >= m, u.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>', u.onclick = () => this.changePage(e, a + 1), t.appendChild(u), c) {
+          const g = [10, 20, 50, 100], p = document.createElement("select");
+          p.className = "t-pagination__sizes", p.disabled = l, g.forEach((v) => {
+            const w = document.createElement("option");
+            w.value = v, w.textContent = v + " 条/页", v === i && (w.selected = !0), p.appendChild(w);
+          }), p.onchange = (v) => this.changePageSize(e, parseInt(v.target.value)), t.appendChild(p);
+        }
+      },
+      /**
+       * 获取页码数组
+       */
+      getPageNumbers(e, t, s) {
+        if (t <= s)
+          return Array.from({ length: t }, (l, c) => c + 1);
+        const n = [], i = Math.floor(s / 2);
+        let a = Math.max(1, e - i), o = Math.min(t, a + s - 1);
+        o - a < s - 1 && (a = Math.max(1, o - s + 1)), a > 1 && (n.push(1), a > 2 && n.push("..."));
+        for (let l = a; l <= o; l++)
+          n.push(l);
+        return o < t && (o < t - 1 && n.push("..."), n.push(t)), n;
+      },
+      /**
+       * 切换页码
+       */
+      changePage(e, t) {
+        const s = this.states[e];
+        if (!s || s.disabled)
+          return;
+        const { totalPages: n, onChange: i } = s;
+        t < 1 || t > n || (s.currentPage = t, this.render(e), i && i(t));
+      },
+      /**
+       * 切换每页条数
+       */
+      changePageSize(e, t) {
+        const s = this.states[e];
+        !s || s.disabled || (s.pageSize = t, s.currentPage = 1, s.totalPages = Math.ceil(s.total / t), this.render(e), s.onSizeChange && s.onSizeChange(t), s.onChange && s.onChange(1));
+      }
+    }, me = {
+      /**
+       * 存储穿梭框状态
+       */
+      states: {},
+      /**
+       * 初始化穿梭框
+       */
+      init() {
+        document.querySelectorAll(".t-transfer").forEach((e) => {
+          const t = e.id;
+          t && (this.states[t] = {
+            leftData: [],
+            rightData: [],
+            leftChecked: [],
+            rightChecked: []
+          }, this.parseData(t));
+        });
+      },
+      /**
+       * 解析初始数据
+       * @param {string} transferId - 穿梭框ID
+       */
+      parseData(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        const s = this.states[e], n = t.querySelector(".t-transfer__panel--left");
+        n && n.querySelectorAll(".t-transfer__item").forEach((a) => {
+          s.leftData.push({
+            key: a.dataset.key,
+            label: a.textContent.trim(),
+            disabled: a.classList.contains("is-disabled")
+          });
+        });
+        const i = t.querySelector(".t-transfer__panel--right");
+        i && i.querySelectorAll(".t-transfer__item").forEach((a) => {
+          s.rightData.push({
+            key: a.dataset.key,
+            label: a.textContent.trim(),
+            disabled: a.classList.contains("is-disabled")
+          });
+        });
+      },
+      /**
+       * 切换选中状态
+       * @param {string} transferId - 穿梭框ID
+       * @param {string} direction - 方向 (left/right)
+       * @param {string} key - 数据key
+       */
+      toggleCheck(e, t, s) {
+        const n = this.states[e];
+        if (!n)
+          return;
+        const i = t === "left" ? n.leftChecked : n.rightChecked, a = i.indexOf(s);
+        a > -1 ? i.splice(a, 1) : i.push(s), this.updateCheckUI(e, t, s), this.updateCheckAllState(e, t);
+      },
+      /**
+       * 更新选中UI
+       * @param {string} transferId - 穿梭框ID
+       * @param {string} direction - 方向
+       * @param {string} key - 数据key
+       */
+      updateCheckUI(e, t, s) {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        const i = n.querySelector(".t-transfer__panel--" + t), a = i == null ? void 0 : i.querySelector(`[data-key="${s}"]`);
+        a && a.classList.toggle("is-checked");
+      },
+      /**
+       * 全选/取消全选
+       * @param {string} transferId - 穿梭框ID
+       * @param {string} direction - 方向
+       */
+      checkAll(e, t) {
+        const s = this.states[e];
+        if (!s)
+          return;
+        const n = t === "left" ? s.leftData : s.rightData, i = t === "left" ? s.leftChecked : s.rightChecked;
+        i.length === n.filter((o) => !o.disabled).length ? i.length = 0 : (i.length = 0, n.forEach((o) => {
+          o.disabled || i.push(o.key);
+        })), this.renderPanel(e, t), this.updateCheckAllState(e, t);
+      },
+      /**
+       * 更新全选状态
+       * @param {string} transferId - 穿梭框ID
+       * @param {string} direction - 方向
+       */
+      updateCheckAllState(e, t) {
+        const s = document.getElementById(e), n = this.states[e];
+        if (!s || !n)
+          return;
+        const i = s.querySelector(".t-transfer__panel--" + t), a = i == null ? void 0 : i.querySelector(".t-transfer__header .t-checkbox");
+        if (a) {
+          const l = t === "left" ? n.leftData : n.rightData, c = t === "left" ? n.leftChecked : n.rightChecked, d = l.filter((m) => !m.disabled);
+          a.classList.toggle("is-checked", c.length === d.length && d.length > 0), a.classList.toggle("is-indeterminate", c.length > 0 && c.length < d.length);
+        }
+        const o = i == null ? void 0 : i.querySelector(".t-transfer__count");
+        if (o) {
+          const l = t === "left" ? n.leftChecked : n.rightChecked, c = t === "left" ? n.leftData : n.rightData;
+          o.textContent = l.length + "/" + c.length;
+        }
+      },
+      /**
+       * 移动到右侧
+       * @param {string} transferId - 穿梭框ID
+       */
+      toRight(e) {
+        const t = this.states[e];
+        if (!t || t.leftChecked.length === 0)
+          return;
+        const s = t.leftData.filter((i) => t.leftChecked.includes(i.key));
+        t.rightData.push(...s), t.leftData = t.leftData.filter((i) => !t.leftChecked.includes(i.key)), t.leftChecked = [], this.renderPanel(e, "left"), this.renderPanel(e, "right"), document.getElementById(e).dispatchEvent(new CustomEvent("t:transfer:change", {
+          detail: { leftData: t.leftData, rightData: t.rightData }
+        }));
+      },
+      /**
+       * 移动到左侧
+       * @param {string} transferId - 穿梭框ID
+       */
+      toLeft(e) {
+        const t = this.states[e];
+        if (!t || t.rightChecked.length === 0)
+          return;
+        const s = t.rightData.filter((i) => t.rightChecked.includes(i.key));
+        t.leftData.push(...s), t.rightData = t.rightData.filter((i) => !t.rightChecked.includes(i.key)), t.rightChecked = [], this.renderPanel(e, "left"), this.renderPanel(e, "right"), document.getElementById(e).dispatchEvent(new CustomEvent("t:transfer:change", {
+          detail: { leftData: t.leftData, rightData: t.rightData }
+        }));
+      },
+      /**
+       * 渲染面板
+       * @param {string} transferId - 穿梭框ID
+       * @param {string} direction - 方向
+       */
+      renderPanel(e, t) {
+        const s = document.getElementById(e), n = this.states[e];
+        if (!s || !n)
+          return;
+        const i = s.querySelector(".t-transfer__panel--" + t), a = i == null ? void 0 : i.querySelector(".t-transfer__list");
+        if (!a)
+          return;
+        const o = t === "left" ? n.leftData : n.rightData, l = t === "left" ? n.leftChecked : n.rightChecked;
+        a.innerHTML = "", o.forEach((c) => {
+          const d = document.createElement("div");
+          d.className = "t-transfer__item", d.dataset.key = c.key, c.disabled && d.classList.add("is-disabled"), l.includes(c.key) && d.classList.add("is-checked"), d.innerHTML = `
+                    <label class="t-checkbox ${l.includes(c.key) ? "is-checked" : ""}">
+                        <span class="t-checkbox__input">
+                            <span class="t-checkbox__inner"></span>
+                        </span>
+                        <span class="t-checkbox__label">${c.label}</span>
+                    </label>
+                `, c.disabled || d.addEventListener("click", () => {
+            this.toggleCheck(e, t, c.key);
+          }), a.appendChild(d);
+        }), this.updateCheckAllState(e, t);
+      },
+      /**
+       * 设置数据
+       * @param {string} transferId - 穿梭框ID
+       * @param {Array} leftData - 左侧数据
+       * @param {Array} rightData - 右侧数据
+       */
+      setData(e, t, s) {
+        const n = this.states[e];
+        n && (n.leftData = t || [], n.rightData = s || [], n.leftChecked = [], n.rightChecked = [], this.renderPanel(e, "left"), this.renderPanel(e, "right"));
+      },
+      /**
+       * 获取数据
+       * @param {string} transferId - 穿梭框ID
+       * @returns {Object} 数据对象
+       */
+      getData(e) {
+        const t = this.states[e];
+        return t ? {
+          leftData: t.leftData,
+          rightData: t.rightData
+        } : { leftData: [], rightData: [] };
+      }
+    }, fe = {
+      /**
+       * 存储弹出框状态
+       */
+      states: {},
+      /**
+       * 初始化弹出框
+       */
+      init() {
+        document.addEventListener("click", (e) => {
+          document.querySelectorAll(".t-popover.is-visible").forEach((t) => {
+            const s = document.querySelector(`[data-popover="${t.id}"]`);
+            s && !s.contains(e.target) && !t.contains(e.target) && this.hide(t.id);
+          });
+        }), document.querySelectorAll(".t-popover--hover").forEach((e) => {
+          e.addEventListener("mouseenter", () => {
+            e.classList.contains("is-disabled") || e.classList.add("active");
+          }), e.addEventListener("mouseleave", () => {
+            e.classList.remove("active");
+          });
+        });
+      },
+      /**
+       * 显示弹出框
+       * @param {string} popoverId - 弹出框ID
+       * @param {HTMLElement} trigger - 触发元素
+       */
+      show(e, t) {
+        const s = document.getElementById(e);
+        s && (document.querySelectorAll(".t-popover.is-visible").forEach((n) => {
+          n.id !== e && n.classList.remove("is-visible");
+        }), s.classList.add("is-visible"), t && this.position(s, t), s.dispatchEvent(new CustomEvent("t:popover:show")));
+      },
+      /**
+       * 隐藏弹出框
+       * @param {string} popoverId - 弹出框ID
+       */
+      hide(e) {
+        const t = document.getElementById(e);
+        t && (t.classList.remove("is-visible"), t.dispatchEvent(new CustomEvent("t:popover:hide")));
+      },
+      /**
+       * 切换弹出框
+       * @param {string} popoverId - 弹出框ID
+       * @param {HTMLElement} trigger - 触发元素
+       */
+      toggle(e, t) {
+        const s = document.getElementById(e);
+        s && (s.classList.contains("is-visible") ? this.hide(e) : this.show(e, t));
+      },
+      /**
+       * 定位弹出框
+       * @param {HTMLElement} popover - 弹出框元素
+       * @param {HTMLElement} trigger - 触发元素
+       */
+      position(e, t) {
+        const s = t.getBoundingClientRect(), n = e.getBoundingClientRect(), i = e.dataset.placement || "bottom";
+        let a, o;
+        switch (i) {
+          case "top":
+            a = s.top - n.height - 8, o = s.left + (s.width - n.width) / 2;
+            break;
+          case "bottom":
+            a = s.bottom + 8, o = s.left + (s.width - n.width) / 2;
+            break;
+          case "left":
+            a = s.top + (s.height - n.height) / 2, o = s.left - n.width - 8;
+            break;
+          case "right":
+            a = s.top + (s.height - n.height) / 2, o = s.right + 8;
+            break;
+        }
+        const l = window.innerWidth, c = window.innerHeight;
+        o < 8 && (o = 8), o + n.width > l - 8 && (o = l - n.width - 8), a < 8 && (a = 8), a + n.height > c - 8 && (a = c - n.height - 8), e.style.position = "fixed", e.style.top = a + "px", e.style.left = o + "px", e.style.zIndex = "9999";
+      }
+    }, ge = {
+      /**
+       * 存储标签页状态
+       */
+      states: {},
+      /**
+       * 初始化标签页
+       */
+      init() {
+        document.querySelectorAll(".t-tabs").forEach((e) => {
+          const t = e.id;
+          if (!t)
+            return;
+          const s = e.querySelector(".t-tabs__item.is-active");
+          this.states[t] = {
+            activeName: (s == null ? void 0 : s.dataset.name) || ""
+          }, e.querySelectorAll(".t-tabs__item").forEach((n) => {
+            n.addEventListener("click", () => {
+              const i = n.dataset.name;
+              i && this.switchTab(t, i);
+            });
+          });
+        });
+      },
+      /**
+       * 切换标签页
+       * @param {string} tabsId - 标签页容器ID
+       * @param {string} tabName - 标签页名称
+       */
+      switchTab(e, t) {
+        const s = document.getElementById(e), n = this.states[e];
+        !s || !n || (n.activeName = t, s.querySelectorAll(".t-tabs__item").forEach((i) => {
+          i.classList.toggle("is-active", i.dataset.name === t);
+        }), s.querySelectorAll(".t-tabs__pane").forEach((i) => {
+          i.classList.toggle("is-active", i.dataset.name === t);
+        }), s.dispatchEvent(new CustomEvent("t:tabs:change", {
+          detail: { name: t }
+        })));
+      },
+      /**
+       * 获取当前激活的标签页
+       * @param {string} tabsId - 标签页容器ID
+       * @returns {string} 当前激活的标签页名称
+       */
+      getActiveTab(e) {
+        const t = this.states[e];
+        return t ? t.activeName : "";
+      },
+      /**
+       * 添加标签页
+       * @param {string} tabsId - 标签页容器ID
+       * @param {Object} tab - 标签页数据
+       */
+      addTab(e, t) {
+        const s = document.getElementById(e);
+        if (!s)
+          return;
+        const n = s.querySelector(".t-tabs__header"), i = s.querySelector(".t-tabs__content");
+        if (n && i) {
+          const a = document.createElement("div");
+          a.className = "t-tabs__item", a.dataset.name = t.name, a.textContent = t.label, a.addEventListener("click", () => {
+            this.switchTab(e, t.name);
+          }), n.appendChild(a);
+          const o = document.createElement("div");
+          o.className = "t-tabs__pane", o.dataset.name = t.name, o.innerHTML = t.content, i.appendChild(o);
+        }
+      },
+      /**
+       * 移除标签页
+       * @param {string} tabsId - 标签页容器ID
+       * @param {string} tabName - 标签页名称
+       */
+      removeTab(e, t) {
+        const s = document.getElementById(e), n = this.states[e];
+        if (!s || !n)
+          return;
+        const i = s.querySelector(`.t-tabs__item[data-name="${t}"]`);
+        i && i.remove();
+        const a = s.querySelector(`.t-tabs__pane[data-name="${t}"]`);
+        if (a && a.remove(), n.activeName === t) {
+          const o = s.querySelector(".t-tabs__item");
+          o && this.switchTab(e, o.dataset.name);
+        }
+      }
+    }, pe = {
+      /**
+       * 当前预览的图片索引
+       */
+      currentIndex: 0,
+      /**
+       * 预览图片列表
+       */
+      previewList: [],
+      /**
+       * 初始化图片组件
+       */
+      init() {
+        document.addEventListener("click", (e) => {
+          var s;
+          const t = e.target.closest(".t-image__img");
+          if (t && ((s = t.closest(".t-image")) != null && s.classList.contains("is-preview"))) {
+            const n = t.dataset.preview || t.src;
+            this.preview(n);
+          }
+        }), document.addEventListener("keydown", (e) => {
+          if (this.isPreviewOpen())
+            switch (e.key) {
+              case "Escape":
+                this.closePreview();
+                break;
+              case "ArrowLeft":
+                this.prevImage();
+                break;
+              case "ArrowRight":
+                this.nextImage();
+                break;
+            }
+        });
+      },
+      /**
+       * 预览图片
+       * @param {string} src - 图片地址
+       * @param {Array} [previewList] - 预览列表
+       */
+      preview(e, t) {
+        t ? (this.previewList = t, this.currentIndex = t.indexOf(e)) : (this.previewList = [e], this.currentIndex = 0), this.showPreviewModal();
+      },
+      /**
+       * 显示预览模态框
+       */
+      showPreviewModal() {
+        let e = document.getElementById("t-image-preview");
+        e || (e = document.createElement("div"), e.id = "t-image-preview", e.className = "t-image-preview", e.innerHTML = `
+                    <div class="t-image-preview__mask"></div>
+                    <div class="t-image-preview__content">
+                        <img class="t-image-preview__img" src="" alt="">
+                        <div class="t-image-preview__actions">
+                            <button class="t-image-preview__btn" onclick="TbeUI.Image.prevImage()">
+                                <i class="t-icon-arrow-left"></i>
+                            </button>
+                            <button class="t-image-preview__btn" onclick="TbeUI.Image.nextImage()">
+                                <i class="t-icon-arrow-right"></i>
+                            </button>
+                            <button class="t-image-preview__btn" onclick="TbeUI.Image.closePreview()">
+                                <i class="t-icon-close"></i>
+                            </button>
+                        </div>
+                        <div class="t-image-preview__counter">
+                            <span class="t-image-preview__current">1</span> / <span class="t-image-preview__total">1</span>
+                        </div>
+                    </div>
+                `, e.querySelector(".t-image-preview__mask").addEventListener("click", () => {
+          this.closePreview();
+        }), document.body.appendChild(e)), e.classList.add("is-visible"), this.updatePreviewImage();
+      },
+      /**
+       * 更新预览图片
+       */
+      updatePreviewImage() {
+        const e = document.getElementById("t-image-preview");
+        if (!e)
+          return;
+        const t = e.querySelector(".t-image-preview__img"), s = e.querySelector(".t-image-preview__current"), n = e.querySelector(".t-image-preview__total");
+        t && (t.src = this.previewList[this.currentIndex]), s && (s.textContent = this.currentIndex + 1), n && (n.textContent = this.previewList.length);
+      },
+      /**
+       * 关闭预览
+       */
+      closePreview() {
+        const e = document.getElementById("t-image-preview");
+        e && e.classList.remove("is-visible");
+      },
+      /**
+       * 检查预览是否打开
+       * @returns {boolean} 是否打开
+       */
+      isPreviewOpen() {
+        const e = document.getElementById("t-image-preview");
+        return e == null ? void 0 : e.classList.contains("is-visible");
+      },
+      /**
+       * 上一张图片
+       */
+      prevImage() {
+        this.previewList.length <= 1 || (this.currentIndex--, this.currentIndex < 0 && (this.currentIndex = this.previewList.length - 1), this.updatePreviewImage());
+      },
+      /**
+       * 下一张图片
+       */
+      nextImage() {
+        this.previewList.length <= 1 || (this.currentIndex++, this.currentIndex >= this.previewList.length && (this.currentIndex = 0), this.updatePreviewImage());
+      }
+    }, ye = {
+      /**
+       * 处理头像图片加载失败
+       * @param {HTMLImageElement} img - 图片元素
+       * @param {string} fallbackText - 备用文字（可选）
+       */
+      handleError(e, t) {
+        if (!e)
+          return;
+        const s = e.closest(".t-avatar");
+        if (s)
+          if (e.remove(), t) {
+            const n = document.createElement("span");
+            n.className = "t-avatar__text", n.textContent = t, s.appendChild(n);
+          } else {
+            const n = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            n.setAttribute("class", "t-avatar__icon"), n.setAttribute("viewBox", "0 0 24 24"), n.setAttribute("fill", "none"), n.setAttribute("stroke", "currentColor"), n.setAttribute("stroke-width", "2"), n.setAttribute("stroke-linecap", "round"), n.setAttribute("stroke-linejoin", "round");
+            const i = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            i.setAttribute("d", "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2");
+            const a = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            a.setAttribute("cx", "12"), a.setAttribute("cy", "7"), a.setAttribute("r", "4"), n.appendChild(i), n.appendChild(a), s.appendChild(n);
+          }
+      }
+    }, P = {
+      /**
+       * 移除标签
+       * @param {HTMLElement} closeBtn - 关闭按钮元素
+       */
+      remove(e) {
+        if (!e)
+          return;
+        const t = e.closest(".t-tag");
+        if (!t)
+          return;
+        t.classList.add("t-tag-leave"), setTimeout(() => {
+          t.parentNode && t.parentNode.removeChild(t);
+        }, 300);
+        const s = t.closest(".t-tag-group");
+        s && s.dispatchEvent(new CustomEvent("t:tag:close", {
+          detail: { tag: t }
+        }));
+      },
+      /**
+       * 移除动态标签（用于动态编辑标签组）
+       * @param {HTMLElement} closeBtn - 关闭按钮元素
+       */
+      removeDynamic(e) {
+        this.remove(e);
+      },
+      /**
+       * 显示标签输入框
+       * @param {string} groupId - 标签组ID（可选）
+       */
+      showInput(e) {
+        const t = e ? document.getElementById(e) : document.querySelector(".t-tag-group");
+        if (!t)
+          return;
+        const s = t.querySelector(".t-tag--editable"), n = t.querySelector(".t-tag-input"), i = t.querySelector(".t-tag-input input");
+        s && (s.style.display = "none"), n && (n.style.display = "inline-flex"), i && i.focus();
+      },
+      /**
+       * 隐藏标签输入框
+       * @param {string} groupId - 标签组ID（可选）
+       */
+      hideInput(e) {
+        const t = e ? document.getElementById(e) : document.querySelector(".t-tag-group");
+        if (!t)
+          return;
+        const s = t.querySelector(".t-tag--editable"), n = t.querySelector(".t-tag-input"), i = t.querySelector(".t-tag-input input");
+        setTimeout(() => {
+          s && (s.style.display = "inline-flex"), n && (n.style.display = "none"), i && (i.value = "");
+        }, 200);
+      },
+      /**
+       * 处理标签输入
+       * @param {Event} event - 键盘事件
+       * @param {string} groupId - 标签组ID（可选）
+       */
+      handleInput(e, t) {
+        const s = t ? document.getElementById(t) : document.querySelector(".t-tag-group");
+        if (s)
+          if (e.key === "Enter") {
+            const n = e.target, i = n.value.trim();
+            i && this.add(i, s), n.value = "", this.hideInput(t);
+          } else
+            e.key === "Escape" && this.hideInput(t);
+      },
+      /**
+       * 添加新标签
+       * @param {string} text - 标签文本
+       * @param {HTMLElement} group - 标签组元素
+       */
+      add(e, t) {
+        if (!t)
+          return;
+        const s = document.createElement("span");
+        s.className = "t-tag t-tag-enter", s.innerHTML = e + '<i class="t-tag__close" onclick="removeDynamicTag(this)">×</i>';
+        const n = t.querySelector(".t-tag--editable");
+        n ? t.insertBefore(s, n) : t.appendChild(s), setTimeout(() => {
+          s.classList.remove("t-tag-enter");
+        }, 300), t.dispatchEvent(new CustomEvent("t:tag:add", {
+          detail: { text: e, tag: s }
+        }));
+      }
+    }, ve = {
+      /**
+       * 存储走马灯状态
+       */
+      states: {},
+      /**
+       * 初始化走马灯
+       */
+      init() {
+        document.querySelectorAll(".t-carousel").forEach((e) => {
+          const t = e.id;
+          if (!t)
+            return;
+          const s = e.dataset.autoplay === "true", n = parseInt(e.dataset.interval) || 3e3, i = e.dataset.loop !== "false";
+          this.states[t] = {
+            currentIndex: 0,
+            itemCount: e.querySelectorAll(".t-carousel__item").length,
+            autoplay: s,
+            interval: n,
+            loop: i,
+            timer: null
+          }, this.bindEvents(t), s && this.startAutoplay(t), this.updateIndicators(t);
+        });
+      },
+      /**
+       * 绑定事件
+       * @param {string} carouselId - 走马灯ID
+       */
+      bindEvents(e) {
+        const t = document.getElementById(e);
+        if (!t)
+          return;
+        const s = this.states[e], n = t.querySelector(".t-carousel__arrow--left");
+        n && n.addEventListener("click", () => {
+          this.prev(e), this.resetAutoplay(e);
+        });
+        const i = t.querySelector(".t-carousel__arrow--right");
+        i && i.addEventListener("click", () => {
+          this.next(e), this.resetAutoplay(e);
+        }), t.querySelectorAll(".t-carousel__indicator").forEach((a, o) => {
+          a.addEventListener("click", () => {
+            this.goTo(e, o), this.resetAutoplay(e);
+          });
+        }), t.addEventListener("mouseenter", () => {
+          this.stopAutoplay(e);
+        }), t.addEventListener("mouseleave", () => {
+          s.autoplay && this.startAutoplay(e);
+        });
+      },
+      /**
+       * 切换到指定索引
+       * @param {string} carouselId - 走马灯ID
+       * @param {number} index - 目标索引
+       */
+      goTo(e, t) {
+        const s = document.getElementById(e), n = this.states[e];
+        if (!s || !n)
+          return;
+        t < 0 ? t = n.loop ? n.itemCount - 1 : 0 : t >= n.itemCount && (t = n.loop ? 0 : n.itemCount - 1), n.currentIndex = t;
+        const i = s.querySelector(".t-carousel__track");
+        i && (i.style.transform = "translateX(-" + t * 100 + "%)"), this.updateIndicators(e), s.dispatchEvent(new CustomEvent("t:carousel:change", {
+          detail: { index: t }
+        }));
+      },
+      /**
+       * 下一张
+       * @param {string} carouselId - 走马灯ID
+       */
+      next(e) {
+        const t = this.states[e];
+        t && this.goTo(e, t.currentIndex + 1);
+      },
+      /**
+       * 上一张
+       * @param {string} carouselId - 走马灯ID
+       */
+      prev(e) {
+        const t = this.states[e];
+        t && this.goTo(e, t.currentIndex - 1);
+      },
+      /**
+       * 更新指示器
+       * @param {string} carouselId - 走马灯ID
+       */
+      updateIndicators(e) {
+        const t = document.getElementById(e), s = this.states[e];
+        !t || !s || t.querySelectorAll(".t-carousel__indicator").forEach((n, i) => {
+          n.classList.toggle("is-active", i === s.currentIndex);
+        });
+      },
+      /**
+       * 开始自动播放
+       * @param {string} carouselId - 走马灯ID
+       */
+      startAutoplay(e) {
+        const t = this.states[e];
+        !t || !t.autoplay || (this.stopAutoplay(e), t.timer = setInterval(() => {
+          this.next(e);
+        }, t.interval));
+      },
+      /**
+       * 停止自动播放
+       * @param {string} carouselId - 走马灯ID
+       */
+      stopAutoplay(e) {
+        const t = this.states[e];
+        !t || !t.timer || (clearInterval(t.timer), t.timer = null);
+      },
+      /**
+       * 重置自动播放
+       * @param {string} carouselId - 走马灯ID
+       */
+      resetAutoplay(e) {
+        const t = this.states[e];
+        !t || !t.autoplay || (this.stopAutoplay(e), this.startAutoplay(e));
+      },
+      /**
+       * 设置自动播放
+       * @param {string} carouselId - 走马灯ID
+       * @param {boolean} autoplay - 是否自动播放
+       */
+      setAutoplay(e, t) {
+        const s = this.states[e];
+        s && (s.autoplay = t, t ? this.startAutoplay(e) : this.stopAutoplay(e));
+      }
+    }, A = {
+      /**
+       * 树形控件状态管理
+       */
+      states: {},
+      /**
+       * 拖拽状态
+       */
+      dragNode: null,
+      dragTreeId: null,
+      dragNodeEl: null,
+      /**
+       * 树形数据
+       */
+      treeData: {
+        basic: [
+          { id: 1, label: "一级 1", children: [
+            { id: 4, label: "二级 1-1", children: [
+              { id: 9, label: "三级 1-1-1" },
+              { id: 10, label: "三级 1-1-2" }
+            ] }
+          ] },
+          { id: 2, label: "一级 2", children: [
+            { id: 5, label: "二级 2-1" },
+            { id: 6, label: "二级 2-2" }
+          ] },
+          { id: 3, label: "一级 3", children: [
+            { id: 7, label: "二级 3-1" },
+            { id: 8, label: "二级 3-2" }
+          ] }
+        ],
+        selectable: [
+          { id: 1, label: "一级 1", children: [
+            { id: 4, label: "二级 1-1", children: [
+              { id: 9, label: "三级 1-1-1" },
+              { id: 10, label: "三级 1-1-2" }
+            ] }
+          ] },
+          { id: 2, label: "一级 2", children: [
+            { id: 5, label: "二级 2-1" },
+            { id: 6, label: "二级 2-2" }
+          ] },
+          { id: 3, label: "一级 3", children: [
+            { id: 7, label: "二级 3-1" },
+            { id: 8, label: "二级 3-2", disabled: !0 }
+          ] }
+        ],
+        lazy: [
+          { id: 1, label: "region1", isLeaf: !1 },
+          { id: 2, label: "region2", isLeaf: !1 }
+        ],
+        defaultExpanded: [
+          { id: 1, label: "一级 1", expanded: !0, children: [
+            { id: 4, label: "二级 1-1", expanded: !0, children: [
+              { id: 9, label: "三级 1-1-1" },
+              { id: 10, label: "三级 1-1-2" }
+            ] }
+          ] },
+          { id: 2, label: "一级 2", children: [
+            { id: 5, label: "二级 2-1" },
+            { id: 6, label: "二级 2-2" }
+          ] },
+          { id: 3, label: "一级 3", children: [
+            { id: 7, label: "二级 3-1" },
+            { id: 8, label: "二级 3-2" }
+          ] }
+        ],
+        disabled: [
+          { id: 1, label: "一级 1", children: [
+            { id: 4, label: "二级 1-1", children: [
+              { id: 9, label: "三级 1-1-1" },
+              { id: 10, label: "三级 1-1-2" }
+            ] }
+          ] },
+          { id: 2, label: "一级 2", disabled: !0, children: [
+            { id: 5, label: "二级 2-1" },
+            { id: 6, label: "二级 2-2" }
+          ] },
+          { id: 3, label: "一级 3", children: [
+            { id: 7, label: "二级 3-1", disabled: !0 },
+            { id: 8, label: "二级 3-2" }
+          ] }
+        ],
+        custom: [
+          { id: 1, label: "一级 1", children: [
+            { id: 4, label: "二级 1-1", children: [
+              { id: 9, label: "三级 1-1-1" },
+              { id: 10, label: "三级 1-1-2" }
+            ] }
+          ] },
+          { id: 2, label: "一级 2", children: [
+            { id: 5, label: "二级 2-1" },
+            { id: 6, label: "二级 2-2" }
+          ] },
+          { id: 3, label: "一级 3", children: [
+            { id: 7, label: "二级 3-1" },
+            { id: 8, label: "二级 3-2" }
+          ] }
+        ],
+        filter: [
+          { id: 1, label: "一级 1", children: [
+            { id: 4, label: "二级 1-1", children: [
+              { id: 9, label: "三级 1-1-1" },
+              { id: 10, label: "三级 1-1-2" }
+            ] }
+          ] },
+          { id: 2, label: "一级 2", children: [
+            { id: 5, label: "二级 2-1" },
+            { id: 6, label: "二级 2-2" }
+          ] },
+          { id: 3, label: "一级 3", children: [
+            { id: 7, label: "二级 3-1" },
+            { id: 8, label: "二级 3-2" }
+          ] }
+        ],
+        accordion: [
+          { id: 1, label: "一级 1", children: [
+            { id: 4, label: "二级 1-1" },
+            { id: 5, label: "二级 1-2" }
+          ] },
+          { id: 2, label: "一级 2", children: [
+            { id: 6, label: "二级 2-1" },
+            { id: 7, label: "二级 2-2" }
+          ] },
+          { id: 3, label: "一级 3", children: [
+            { id: 8, label: "二级 3-1" },
+            { id: 9, label: "二级 3-2" }
+          ] }
+        ],
+        draggable: [
+          { id: 1, label: "一级 1", children: [
+            { id: 4, label: "二级 1-1", children: [
+              { id: 9, label: "三级 1-1-1" },
+              { id: 10, label: "三级 1-1-2" }
+            ] }
+          ] },
+          { id: 2, label: "一级 2", children: [
+            { id: 5, label: "二级 2-1" },
+            { id: 6, label: "二级 2-2" }
+          ] },
+          { id: 3, label: "一级 3", children: [
+            { id: 7, label: "二级 3-1" },
+            { id: 8, label: "二级 3-2" }
+          ] }
+        ]
+      },
+      /**
+       * 初始化所有树形控件
+       */
+      init() {
+        this.renderTree("tree-basic", this.treeData.basic, { showCheckbox: !1 }), this.renderTree("tree-selectable", this.treeData.selectable, { showCheckbox: !0 }), this.renderTree("tree-lazy", this.treeData.lazy, { lazy: !0, load: this.loadNode }), this.renderTree("tree-default-expanded", this.treeData.defaultExpanded, {
+          showCheckbox: !1,
+          highlightCurrent: !0,
+          defaultExpandedKeys: [1, 4]
+        }), this.renderTree("tree-disabled", this.treeData.disabled, { showCheckbox: !0 }), this.renderTree("tree-node-select", this.treeData.basic, {
+          showCheckbox: !1,
+          highlightCurrent: !0
+        }), this.renderTree("tree-custom", this.treeData.custom, {
+          showCheckbox: !1,
+          renderContent: this.renderCustomContent
+        }), this.renderTree("tree-filter", this.treeData.filter, { showCheckbox: !1 }), this.renderTree("tree-accordion", this.treeData.accordion, { showCheckbox: !1, accordion: !0 }), this.renderTree("tree-draggable", this.treeData.draggable, { showCheckbox: !1, draggable: !0 });
+      },
+      /**
+       * 渲染树形控件
+       */
+      renderTree(e, t, s = {}) {
+        const n = document.getElementById(e);
+        if (!n)
+          return;
+        const i = this.states[e], a = i ? i.checkedKeys : /* @__PURE__ */ new Set(), o = i ? i.expandedKeys : new Set(s.defaultExpandedKeys || []), l = i ? i.currentKey : null;
+        this.states[e] = {
+          data: JSON.parse(JSON.stringify(t)),
+          options: s,
+          expandedKeys: o,
+          checkedKeys: a,
+          currentKey: l
+        }, n.innerHTML = "";
+        const c = document.createElement("div");
+        c.className = "t-tree-content", this.states[e].data.forEach((d) => {
+          c.appendChild(this.createTreeNode(e, d, 0));
+        }), n.appendChild(c);
+      },
+      /**
+       * 创建树节点
+       */
+      createTreeNode(e, t, s, n = null) {
+        const i = this.states[e], a = i.options, o = document.createElement("div");
+        o.className = "t-tree-node", o.dataset.nodeId = t.id, t.disabled && o.classList.add("is-disabled");
+        const l = document.createElement("div");
+        l.className = "t-tree-node__content", i.currentKey === t.id && l.classList.add("is-current");
+        for (let r = 0; r < s; r++) {
+          const h = document.createElement("span");
+          h.className = "t-tree-node__indent", l.appendChild(h);
+        }
+        const c = document.createElement("span");
+        c.className = "t-tree-node__expand-icon";
+        const d = t.children && t.children.length > 0;
+        if (!d && !a.lazy || t.isLeaf === !0 ? c.classList.add("is-leaf") : (c.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>', (i.expandedKeys.has(t.id) || t.expanded) && c.classList.add("expanded"), t.disabled ? (c.classList.add("is-disabled"), c.style.cursor = "not-allowed", c.style.opacity = "0.5") : c.onclick = (r) => {
+          r.stopPropagation(), this.toggleNode(e, t, o);
+        }), l.appendChild(c), a.showCheckbox) {
+          const r = document.createElement("span");
+          r.className = "t-tree-node__checkbox", t.disabled && r.classList.add("is-disabled");
+          const h = i.checkedKeys.has(t.id), f = this.isIndeterminate(e, t);
+          h ? r.classList.add("is-checked") : f && r.classList.add("is-indeterminate"), r.onclick = (u) => {
+            u.preventDefault(), u.stopPropagation(), t.disabled || this.toggleCheckbox(e, t);
+          }, r.addEventListener("mousedown", (u) => {
+            u.stopPropagation();
+          }), l.appendChild(r);
+        }
+        if (a.renderContent)
+          l.appendChild(a.renderContent(t));
+        else {
+          const r = document.createElement("span");
+          r.className = "t-tree-node__label", r.textContent = t.label, l.appendChild(r);
+        }
+        if (l.onclick = (r) => {
+          t.disabled || (!(r.target.closest(".t-tree-node__checkbox") || r.target.closest(".t-tree-node__expand-icon")) && (d || a.lazy && !t.isLeaf && !t.loaded) ? this.toggleNode(e, t, o) : this.selectNode(e, t, l));
+        }, o.appendChild(l), d) {
+          const r = document.createElement("div");
+          r.className = "t-tree-node__children", !i.expandedKeys.has(t.id) && !t.expanded ? (r.classList.add("collapsed"), r.style.height = "0") : r.style.height = "auto", t.children.forEach((h) => {
+            r.appendChild(this.createTreeNode(e, h, s + 1, t));
+          }), o.appendChild(r);
+        } else if (a.lazy && !t.isLeaf && !t.loaded) {
+          const r = document.createElement("div");
+          r.className = "t-tree-node__children collapsed", r.style.height = "0", o.appendChild(r);
+        }
+        return a.draggable && !t.disabled && (l.draggable = !0, l.ondragstart = (r) => this.handleDragStart(r, e, t, o), l.ondragover = (r) => this.handleDragOver(r, e, t, o), l.ondrop = (r) => this.handleDrop(r, e, t, o), l.ondragend = (r) => this.handleDragEnd(r, e, o)), o;
+      },
+      /**
+       * 切换节点展开/折叠
+       */
+      toggleNode(e, t, s) {
+        const n = this.states[e], i = n.options, a = s.querySelector(".t-tree-node__expand-icon"), o = s.querySelector(".t-tree-node__children");
+        if (i.accordion && !n.expandedKeys.has(t.id)) {
+          const l = s.parentElement;
+          l && l.querySelectorAll(":scope > .t-tree-node").forEach((c) => {
+            if (c !== s) {
+              const d = parseInt(c.dataset.nodeId);
+              if (n.expandedKeys.has(d)) {
+                const m = c.querySelector(".t-tree-node__expand-icon"), r = c.querySelector(".t-tree-node__children");
+                m && m.classList.remove("expanded"), r && (r.style.height = r.scrollHeight + "px", setTimeout(() => {
+                  r.style.height = "0";
+                }, 10)), n.expandedKeys.delete(d);
+              }
+            }
+          });
+        }
+        if (i.lazy && !t.loaded && !t.isLeaf && i.load) {
+          const l = document.createElement("span");
+          l.className = "t-tree-node__loading", l.textContent = "⏳", l.style.marginLeft = "4px", l.style.fontSize = "12px", a.parentNode.insertBefore(l, a.nextSibling), a.style.display = "none", i.load(t, (c) => {
+            if (l.remove(), a.style.display = "", t.loaded = !0, t.children = c, c.length === 0) {
+              t.isLeaf = !0, a.classList.add("is-leaf"), a.innerHTML = "";
+              return;
+            }
+            n.expandedKeys.add(t.id), this.renderTree(e, n.data, i);
+          });
+          return;
+        }
+        n.expandedKeys.has(t.id) ? (n.expandedKeys.delete(t.id), a.classList.remove("expanded"), o && (o.style.height = o.scrollHeight + "px", setTimeout(() => {
+          o.style.height = "0";
+        }, 10))) : (n.expandedKeys.add(t.id), a.classList.add("expanded"), o && (o.classList.remove("collapsed"), o.style.height = o.scrollHeight + "px", setTimeout(() => {
+          o.style.height = "auto";
+        }, 300)));
+      },
+      /**
+       * 切换复选框 - 修正 2：完善复选框逻辑
+       */
+      toggleCheckbox(e, t) {
+        const s = this.states[e];
+        s.checkedKeys.has(t.id) ? (s.checkedKeys.delete(t.id), this.uncheckChildren(e, t)) : (s.checkedKeys.add(t.id), this.checkChildren(e, t)), this.updateParentCheckbox(e, t), this.renderTree(e, s.data, s.options);
+      },
+      /**
+       * 选中子节点
+       */
+      checkChildren(e, t) {
+        const s = this.states[e];
+        t.children && t.children.forEach((n) => {
+          n.disabled || (s.checkedKeys.add(n.id), this.checkChildren(e, n));
+        });
+      },
+      /**
+       * 取消选中子节点
+       */
+      uncheckChildren(e, t) {
+        const s = this.states[e];
+        t.children && t.children.forEach((n) => {
+          s.checkedKeys.delete(n.id), this.uncheckChildren(e, n);
+        });
+      },
+      /**
+       * 更新父节点复选框状态
+       */
+      updateParentCheckbox(e, t) {
+      },
+      /**
+       * 判断是否半选状态
+       */
+      isIndeterminate(e, t) {
+        const s = this.states[e];
+        if (!t.children || t.children.length === 0)
+          return !1;
+        let n = 0, i = !1;
+        return t.children.forEach((a) => {
+          s.checkedKeys.has(a.id) ? n++ : this.isIndeterminate(e, a) && (i = !0);
+        }), n > 0 && n < t.children.length || i;
+      },
+      /**
+       * 选择节点
+       */
+      selectNode(e, t, s) {
+        const n = this.states[e];
+        n.currentKey = t.id, s.parentElement.querySelectorAll(".t-tree-node__content").forEach((i) => {
+          i.classList.remove("is-current");
+        }), s.classList.add("is-current");
+      },
+      /**
+       * 懒加载函数
+       */
+      loadNode(e, t) {
+        setTimeout(() => {
+          t([
+            { id: e.id * 10 + 1, label: `子节点 ${e.id}-1` },
+            { id: e.id * 10 + 2, label: `子节点 ${e.id}-2` }
+          ]);
+        }, 500);
+      },
+      /**
+       * 渲染自定义内容
+       */
+      renderCustomContent(e) {
+        const t = document.createElement("div");
+        return t.className = "t-tree-node__custom-content", t.style.display = "flex", t.style.alignItems = "center", t.style.gap = "8px", t.innerHTML = `<span>📁</span><span>${e.label}</span>`, t;
+      },
+      /**
+       * 过滤树 - 修正 4：改进过滤逻辑，支持递归显示匹配的父节点和子节点
+       */
+      filterTree(e) {
+        const t = document.getElementById("tree-filter");
+        if (!t)
+          return;
+        const s = t.querySelectorAll(".t-tree-node");
+        if (!e || e.trim() === "") {
+          s.forEach((a) => {
+            a.style.display = "";
+            const o = a.querySelector(".t-tree-node__children");
+            o && (o.style.display = "", o.classList.remove("collapsed"), o.style.height = "auto");
+            const l = a.querySelector(".t-tree-node__expand-icon");
+            l && !l.classList.contains("is-leaf") && (l.style.display = "");
+          });
+          return;
+        }
+        const n = e.toLowerCase();
+        s.forEach((a) => {
+          a.style.display = "none";
+        });
+        const i = /* @__PURE__ */ new Set();
+        s.forEach((a) => {
+          const o = a.querySelector(".t-tree-node__label");
+          if (o && o.textContent.toLowerCase().includes(n)) {
+            i.add(a);
+            let l = a.parentElement;
+            for (; l && !l.classList.contains("t-tree-content"); ) {
+              if (l.classList.contains("t-tree-node")) {
+                i.add(l);
+                const c = l.querySelector(".t-tree-node__children");
+                c && (c.style.display = "", c.classList.remove("collapsed"), c.style.height = "auto");
+                const d = l.querySelector(".t-tree-node__expand-icon");
+                d && !d.classList.contains("is-leaf") && d.classList.add("expanded");
+              }
+              l = l.parentElement;
+            }
+            this.showAllChildren(a);
+          }
+        }), i.forEach((a) => {
+          a.style.display = "";
+        });
+      },
+      /**
+       * 显示节点的所有子节点（递归）
+       */
+      showAllChildren(e) {
+        const t = e.querySelector(".t-tree-node__children");
+        if (t) {
+          t.style.display = "", t.classList.remove("collapsed"), t.style.height = "auto";
+          const s = e.querySelector(".t-tree-node__expand-icon");
+          s && !s.classList.contains("is-leaf") && s.classList.add("expanded"), t.querySelectorAll(":scope > .t-tree-node").forEach((i) => {
+            i.style.display = "", this.showAllChildren(i);
+          });
+        }
+      },
+      /**
+       * 拖拽开始 - 修正 5：实现拖拽功能
+       */
+      handleDragStart(e, t, s, n) {
+        this.dragNode = s, this.dragTreeId = t, this.dragNodeEl = n, e.dataTransfer.setData("text/plain", JSON.stringify({
+          nodeId: s.id,
+          nodeLabel: s.label
+        })), e.dataTransfer.effectAllowed = "move", setTimeout(() => {
+          n.classList.add("is-dragging");
+        }, 0);
+      },
+      /**
+       * 拖拽经过
+       */
+      handleDragOver(e, t, s, n) {
+        if (e.preventDefault(), e.dataTransfer.dropEffect = "move", this.dragTreeId !== t || this.isDescendant(n, this.dragNodeEl) || this.dragNode.id === s.id)
+          return;
+        const i = e.target.closest(".t-tree-node__content").getBoundingClientRect(), a = e.clientY - i.top, o = i.height;
+        n.classList.remove("is-drop-before", "is-drop-after", "is-drop-inner"), a < o * 0.25 ? n.classList.add("is-drop-before") : a > o * 0.75 ? n.classList.add("is-drop-after") : n.classList.add("is-drop-inner");
+      },
+      /**
+       * 拖拽放下
+       */
+      handleDrop(e, t, s, n) {
+        if (e.preventDefault(), this.dragTreeId !== t || this.dragNode.id === s.id) {
+          this.handleDragEnd(e, t, n);
+          return;
+        }
+        if (this.isDescendant(n, this.dragNodeEl)) {
+          this.handleDragEnd(e, t, n);
+          return;
+        }
+        const i = e.target.closest(".t-tree-node__content").getBoundingClientRect(), a = e.clientY - i.top, o = i.height;
+        let l = "inner";
+        a < o * 0.25 ? l = "before" : a > o * 0.75 && (l = "after"), this.moveNode(t, this.dragNode, s, l), this.handleDragEnd(e, t, n);
+      },
+      /**
+       * 拖拽结束
+       */
+      handleDragEnd(e, t, s) {
+        if (this.states[this.dragTreeId]) {
+          const i = document.getElementById(this.dragTreeId);
+          i && i.querySelectorAll(".t-tree-node").forEach((a) => {
+            a.classList.remove("is-dragging", "is-drop-before", "is-drop-after", "is-drop-inner");
+          });
+        }
+        document.querySelectorAll(".t-tree-node__content.is-drag-over").forEach((i) => {
+          i.classList.remove("is-drag-over");
+        }), this.dragNode = null, this.dragTreeId = null, this.dragNodeEl = null;
+      },
+      /**
+       * 检查 target 是否是 source 的后代节点
+       */
+      isDescendant(e, t) {
+        let s = t.parentElement;
+        for (; s; ) {
+          if (s === e)
+            return !0;
+          s = s.parentElement;
+        }
+        return !1;
+      },
+      /**
+       * 移动节点
+       */
+      moveNode(e, t, s, n) {
+        const i = this.states[e], a = i.data;
+        if (this.removeNodeFromTree(a, t.id), n === "inner") {
+          const o = this.findNodeInTree(a, s.id);
+          o && (o.children || (o.children = []), o.children.push(JSON.parse(JSON.stringify(t))), i.expandedKeys.add(s.id));
+        } else {
+          const o = this.findNodeAndParent(a, s.id);
+          if (o) {
+            const { parent: l, index: c } = o, d = n === "before" ? c : c + 1;
+            l.splice(d, 0, JSON.parse(JSON.stringify(t)));
+          }
+        }
+        this.renderTree(e, a, i.options);
+      },
+      /**
+       * 从树中移除节点
+       */
+      removeNodeFromTree(e, t) {
+        for (let s = 0; s < e.length; s++) {
+          if (e[s].id === t)
+            return e.splice(s, 1), !0;
+          if (e[s].children && this.removeNodeFromTree(e[s].children, t))
+            return !0;
+        }
+        return !1;
+      },
+      /**
+       * 在树中查找节点
+       */
+      findNodeInTree(e, t) {
+        for (let s = 0; s < e.length; s++) {
+          if (e[s].id === t)
+            return e[s];
+          if (e[s].children) {
+            const n = this.findNodeInTree(e[s].children, t);
+            if (n)
+              return n;
+          }
+        }
+        return null;
+      },
+      /**
+       * 查找节点及其父节点数组
+       */
+      findNodeAndParent(e, t, s = null) {
+        for (let n = 0; n < e.length; n++) {
+          if (e[n].id === t)
+            return { parent: s || e, index: n };
+          if (e[n].children) {
+            const i = this.findNodeAndParent(e[n].children, t, e[n].children);
+            if (i)
+              return i;
+          }
+        }
+        return null;
+      }
+    }, De = {
+      /**
+       * 存储所有无限滚动实例
+       */
+      instances: {},
+      /**
+       * 初始化无限滚动
+       */
+      init() {
+        document.querySelectorAll(".t-infinite-scroll-demo").forEach((e) => {
+          const t = e.id;
+          if (!t)
+            return;
+          const s = e.querySelector(".t-infinite-scroll__content"), n = e.querySelector(".t-infinite-scroll__loading"), i = e.querySelector(".t-infinite-scroll__finished");
+          !s || !n || !i || (this.instances[t] = {
+            container: e,
+            list: s,
+            loading: n,
+            finished: i,
+            itemCount: s.querySelectorAll(".t-infinite-scroll__item").length,
+            isLoading: !1,
+            isFinished: !1,
+            maxItems: e.dataset.maxItems ? parseInt(e.dataset.maxItems) : 20,
+            loadOnce: e.dataset.loadOnce ? parseInt(e.dataset.loadOnce) : 3
+          }, e.addEventListener("scroll", () => {
+            this.handleScroll(t);
+          }));
+        });
+      },
+      /**
+       * 处理滚动事件
+       */
+      handleScroll(e) {
+        const t = this.instances[e];
+        if (!t || t.isLoading || t.isFinished)
+          return;
+        const { container: s, list: n, loading: i, finished: a, maxItems: o, loadOnce: l } = t, c = s.scrollTop, d = s.scrollHeight, m = s.clientHeight;
+        c + m >= d - 50 && this.loadMore(e);
+      },
+      /**
+       * 加载更多数据
+       */
+      loadMore(e) {
+        const t = this.instances[e];
+        !t || t.isLoading || t.isFinished || (t.isLoading = !0, t.loading.style.display = "flex", setTimeout(() => {
+          const { list: s, loading: n, finished: i, maxItems: a, loadOnce: o, container: l } = t;
+          if (t.itemCount >= a)
+            t.isFinished = !0, t.loading.style.display = "none", i.style.display = "flex";
+          else {
+            for (let c = 0; c < o && !(t.itemCount >= a); c++) {
+              t.itemCount++;
+              const d = document.createElement("div");
+              d.className = l.querySelector(".t-infinite-scroll__item--card") ? "t-infinite-scroll__item t-infinite-scroll__item--card" : "t-infinite-scroll__item";
+              const m = `2026-03-${Math.floor(Math.random() * 15) + 1}`, r = Math.floor(Math.random() * 500) + 50, h = Math.floor(Math.random() * 300) + 50, f = d.classList.contains("t-infinite-scroll__item--card");
+              d.innerHTML = `
+                            <div class="t-infinite-scroll__item-title">${f ? "卡片标题" : "列表项"} ${t.itemCount}</div>
+                            <div class="t-infinite-scroll__item-desc">这是第 ${t.itemCount} 条数据的描述信息${f ? "，带有阴影效果" : ""}</div>
+                            <div class="t-infinite-scroll__item-meta">
+                                <span>${m}</span>
+                                <span>${f ? "👍" : "浏览"} ${f ? h : r}</span>
+                            </div>
+                        `, s.appendChild(d);
+            }
+            t.isLoading = !1, t.loading.style.display = "none";
+          }
+        }, 800));
+      },
+      /**
+       * 重置实例
+       */
+      reset(e) {
+        const t = this.instances[e];
+        t && (t.isLoading = !1, t.isFinished = !1, t.itemCount = t.list.querySelectorAll(".t-infinite-scroll__item").length, t.loading.style.display = "none", t.finished.style.display = "none");
+      }
+    };
+    function J() {
+      ee.init(), U.init(), ce.init(), B.init(), L.init(), re.init(), de.init(), ue.init(), se.init(), K.init(), X.init(), he.init(), ie.init(), me.init(), fe.init(), ge.init(), ne.init(), pe.init(), ve.init(), A.init(), De.init(), document.addEventListener("keydown", (e) => {
+        e.key === "Tab" && document.body.classList.add("keyboard-navigation");
+      }), document.addEventListener("mousedown", () => {
+        document.body.classList.remove("keyboard-navigation");
+      }), setTimeout(() => {
+        console.clear(), _e(), Le();
+      }, 1500);
+    }
+    document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", J) : J(), window.init = J, window.showTAlert = function(e) {
+      return TbeUI.Alert.show(e);
+    }, window.closeTAlert = function(e) {
+      TbeUI.Alert.close(e);
+    }, window.toggleAlertDescription = function(e) {
+      TbeUI.Alert.toggleDescription(e);
+    }, window.closeAllTAlerts = function() {
+      TbeUI.Alert.closeAll();
+    }, window.showTAlertWithAction = function() {
+      TbeUI.Alert.show({
+        type: "warning",
+        title: "确认操作",
+        description: "您确定要删除这条记录吗？删除后将无法恢复。",
+        showConfirm: !0,
+        duration: 0
+      });
+    }, window.toggleCollapse = function(e) {
+      X.toggle(e);
+    }, window.toggleCascader = function(e) {
+      $.toggleCascader(e);
+    }, window.selectCascaderLevel1 = function(e, t, s) {
+      $.selectCascaderLevel1(e, t, s);
+    }, window.selectCascaderLevel2 = function(e, t, s, n, i) {
+      $.selectCascaderLevel2(e, t, s, n, i);
+    }, window.selectCascaderFinal = function(e, t) {
+      $.selectCascaderFinal(e, t);
+    }, window.clearCascader = function(e, t) {
+      $.clearCascader(e, t);
+    }, window.toggleColorPicker = function(e, t) {
+      t && (t.stopPropagation(), t.preventDefault()), j.toggleColorPicker(e);
+    }, window.selectPredefineColor = function(e, t, s) {
+      s && (s.stopPropagation(), s.preventDefault()), j.selectPredefineColor(e, t);
+    }, window.confirmColor = function(e) {
+      j.confirmColor(e);
+    }, window.toggleDatePicker = function(e) {
+      z.toggle(e);
+    }, window.changeDateMonth = function(e, t) {
+      z.changeMonth(e, t);
+    }, window.selectDate = function(e, t) {
+      z.selectDate(e, t);
+    }, window.clearDate = function(e) {
+      z.clear(e);
+    }, window.toggleTimePicker = function(e) {
+      _.toggle(e);
+    }, window.changeTimeHour = function(e, t) {
+      _.changeHour(e, t);
+    }, window.selectTime = function(e, t) {
+      _.selectTime(e, t);
+    }, window.clearTime = function(e) {
+      _.clear(e);
+    }, window.toggleDateTimePicker = function(e) {
+      x.toggle(e);
+    }, window.changeDateTimeMonth = function(e, t) {
+      x.changeMonth(e, t);
+    }, window.selectDateTimeHour = function(e, t) {
+      x.selectHour(e, t);
+    }, window.selectDateTime = function(e, t) {
+      x.selectDate(e, t);
+    }, window.clearDateTime = function(e) {
+      x.clear(e);
+    }, window.selectDateTimeMinute = function(e, t) {
+      x.selectMinute(e, t);
+    }, window.selectDateTimeSecond = function(e, t) {
+      x.selectSecond(e, t);
+    }, window.confirmDateTimePicker = function(e) {
+      x.confirm(e);
+    }, window.cancelDateTimePicker = function(e) {
+      x.cancel(e);
+    }, window.toggleCheckAll = function() {
+      U.toggleCheckAll();
+    }, window.toggleCheckboxButton = function(e) {
+      U.toggleButton(e);
+    }, window.toggleSelect = function(e) {
+      V.toggleSelect(e);
+    }, window.selectOption = function(e, t, s) {
+      V.selectOption(e, t, s);
+    }, window.clearSelect = function(e, t) {
+      V.clearSelect(e, t);
+    }, window.removeTag = function(e) {
+      P.remove(e);
+    }, window.removeDynamicTag = function(e) {
+      P.removeDynamic(e);
+    }, window.showTagInput = function(e) {
+      P.showInput(e);
+    }, window.hideTagInput = function(e) {
+      P.hideInput(e);
+    }, window.handleTagInput = function(e, t) {
+      P.handleInput(e, t);
+    }, window.handleAvatarError = function(e, t) {
+      ye.handleError(e, t);
+    }, window.renderTree = function(e, t, s) {
+      A.renderTree(e, t, s);
+    }, window.filterTree = function(e) {
+      A.filterTree(e);
+    }, window.toggleTreeNode = function(e) {
+      const t = document.querySelector(`[data-node-id="${e}"]`);
+      if (t) {
+        const s = t.closest(".t-tree").id, n = A.states[s];
+        if (n) {
+          const i = A.findNodeInTree(n.data, parseInt(e));
+          i && A.toggleNode(s, i, t);
+        }
+      }
+    }, window.createPagination = function(e, t) {
+      G.create(e, t);
+    }, window.changePaginationPage = function(e, t) {
+      G.changePage(e, t);
+    }, window.changePaginationPageSize = function(e, t) {
+      G.changePageSize(e, t);
+    }, window.startProgress = function(e, t, s) {
+      const n = document.getElementById(e);
+      if (!n)
+        return;
+      const i = Math.min(100, Math.max(0, t)), a = s || 1e3, o = parseFloat(n.style.width) || 0, l = performance.now();
+      function c(d) {
+        const m = d - l, r = Math.min(m / a, 1), h = r * (2 - r), f = o + (i - o) * h;
+        n.style.width = f + "%", r < 1 && requestAnimationFrame(c);
+      }
+      requestAnimationFrame(c);
+    }, window.switchTab = function(e, t) {
+      const s = document.getElementById(e);
+      if (!s)
+        return;
+      const n = s.querySelectorAll(".t-tabs__item"), i = s.querySelectorAll(".t-tabs__pane");
+      n.forEach((a, o) => {
+        a.classList.remove("is-active"), o === t && a.classList.add("is-active");
+      }), i.forEach((a, o) => {
+        a.classList.remove("is-active"), o === t && a.classList.add("is-active");
+      });
+    }, window.addTab = function(e) {
+      const t = document.getElementById(e);
+      if (!t)
+        return;
+      const s = t.querySelector(".t-tabs__nav") || t.querySelector("#" + e + "-nav"), n = t.querySelector(".t-tabs__content") || t.querySelector("#" + e + "-content");
+      if (!s || !n)
+        return;
+      const i = s.querySelectorAll(".t-tabs__item");
+      n.querySelectorAll(".t-tabs__pane");
+      const a = i.length, o = document.createElement("div");
+      o.className = "t-tabs__item", o.setAttribute("data-index", a), o.setAttribute("onclick", `switchTab('${e}', ${a})`), o.innerHTML = `新标签 ${a + 1} <span class="t-tabs__close" onclick="removeTab(event, '${e}', ${a})">×</span>`, s.appendChild(o);
+      const l = document.createElement("div");
+      l.className = "t-tabs__pane", l.textContent = `新标签 ${a + 1} 内容`, n.appendChild(l), switchTab(e, a);
+    }, window.removeTab = function(e, t, s) {
+      var m;
+      e.stopPropagation();
+      const n = document.getElementById(t);
+      if (!n)
+        return;
+      const i = n.querySelector(".t-tabs__nav") || n.querySelector("#" + t + "-nav"), a = n.querySelector(".t-tabs__content") || n.querySelector("#" + t + "-content");
+      if (!i || !a)
+        return;
+      const o = i.querySelectorAll(".t-tabs__item"), l = a.querySelectorAll(".t-tabs__pane");
+      if (o.length <= 1)
+        return;
+      const c = parseInt((m = i.querySelector(".is-active")) == null ? void 0 : m.getAttribute("data-index")) || 0;
+      o[s] && o[s].remove(), l[s] && l[s].remove();
+      let d = c;
+      s === c ? d = Math.max(0, c - 1) : s < c && (d = c - 1), switchTab(t, d);
+    }, window.selectRadioButton = function(e, t) {
+      ee.selectRadioButton(e, t);
+    }, window.clearInput = function(e) {
+      H.clearInput(e);
+    }, window.togglePassword = function(e, t) {
+      H.togglePassword(e, t);
+    }, window.autoResize = function(e) {
+      H.autoResize(e);
+    }, window.updateCharCount = function(e, t) {
+      H.updateCharCount(e, t);
+    }, window.changeNumber = function(e, t) {
+      Y.changeNumber(e, t);
+    }, window.changeNumberStep = function(e, t, s) {
+      Y.changeNumberStep(e, t, s);
+    }, window.changeNumberStrict = function(e, t, s) {
+      Y.changeNumberStrict(e, t, s);
+    }, window.toggleSwitch = function(e) {
+      se.toggleSwitch(e);
+    }, window.clickSlider = function(e, t) {
+      K.clickSlider(e, t);
+    }, window.startDragSlider = function(e, t, s) {
+      K.startDragSlider(e, t, s);
+    }, window.setRate = function(e, t) {
+      W.setRate(e, t);
+    }, window.hoverRate = function(e, t) {
+      W.hoverRate(e, t);
+    }, window.leaveRate = function(e) {
+      W.leaveRate(e);
+    }, window.changeLabelPosition = function(e, t) {
+      ie.changeLabelPosition(e, t);
+    }, window.toggleTimePicker = function(e) {
+      _.toggle(e);
+    }, window.selectTime = function(e, t) {
+      _.selectTime(e, t);
+    }, window.selectHour = function(e, t) {
+      _.selectHour(e, t);
+    }, window.selectMinute = function(e, t) {
+      _.selectMinute(e, t);
+    }, window.confirmTimePicker = function(e) {
+      _.confirm(e);
+    }, window.cancelTimePicker = function(e) {
+      _.cancel(e);
+    }, window.switchTab = function(e, t) {
+      const s = document.getElementById(e);
+      if (!s)
+        return;
+      const n = s.querySelectorAll(".t-tabs__item"), i = s.querySelectorAll(".t-tabs__pane");
+      n.forEach((a) => a.classList.remove("is-active")), i.forEach((a) => a.classList.remove("is-active")), n[t] && n[t].classList.add("is-active"), i[t] && i[t].classList.add("is-active");
+    };
+    let ae = 2;
+    window.closeTab = function(e, t, s) {
+      e.stopPropagation();
+      const n = document.getElementById(t);
+      if (!n)
+        return;
+      const i = n.querySelector(".t-tabs__nav"), a = n.querySelector(".t-tabs__content");
+      if (!i || !a)
+        return;
+      const o = i.querySelectorAll(".t-tabs__item"), l = a.querySelectorAll(".t-tabs__pane");
+      if (o.length <= 1) {
+        alert("至少保留一个标签页");
+        return;
+      }
+      o[s] && o[s].remove(), l[s] && l[s].remove();
+      const c = i.querySelectorAll(".t-tabs__item");
+      c.forEach((m, r) => {
+        m.setAttribute("data-index", r), m.setAttribute("onclick", `switchTab('${t}', ${r})`);
+        const h = m.querySelector(".t-tabs__close");
+        h && h.setAttribute("onclick", `closeTab(event, '${t}', ${r})`);
+      });
+      const d = s < c.length ? s : c.length - 1;
+      window.switchTab(t, d);
+    }, window.addTab = function(e) {
+      const t = document.getElementById(e);
+      if (!t)
+        return;
+      const s = t.querySelector(".t-tabs__nav"), n = t.querySelector(".t-tabs__content");
+      if (!s || !n)
+        return;
+      const i = s.querySelectorAll(".t-tabs__item").length;
+      ae++;
+      const a = document.createElement("div");
+      a.className = "t-tabs__item", a.setAttribute("data-index", i), a.setAttribute("onclick", `switchTab('${e}', ${i})`), a.innerHTML = `
+            <span>新标签 ${ae}</span>
+            <span class="t-tabs__close" onclick="closeTab(event, '${e}', ${i})">×</span>
+        `;
+      const o = document.createElement("div");
+      o.className = "t-tabs__pane", o.textContent = `新标签 ${ae} 内容`, s.appendChild(a), n.appendChild(o), window.switchTab(e, i);
+    }, window.showTMessage = function(e) {
+      return TbeUI.Message.show(e);
+    }, window.showMessage = window.showTMessage, window.closeTMessage = function(e) {
+      const t = typeof e == "string" ? document.getElementById(e) : e;
+      t && TbeUI.Message.close(t);
+    }, window.closeMessage = window.closeTMessage, window.closeAllTMessages = function() {
+      TbeUI.Message.closeAll();
+    }, window.closeAllMessages = window.closeAllTMessages, window.showLoadingMessage = function() {
+      const e = showTMessage({
+        type: "loading",
+        message: "正在加载中...",
+        duration: 0,
+        showClose: !0
+      });
+      setTimeout(() => {
+        closeTMessage(e), showTMessage({ type: "success", message: "加载完成！" });
+      }, 3e3);
+    }, window.showProgressMessage = function() {
+      const e = showTMessage({
+        type: "loading",
+        message: "上传中 0%",
+        duration: 0,
+        showClose: !0
+      });
+      let t = 0;
+      const s = setInterval(() => {
+        if (t += Math.random() * 15, t >= 100)
+          t = 100, clearInterval(s), closeTMessage(e), showTMessage({ type: "success", message: "上传成功！" });
+        else {
+          const n = typeof e == "string" ? document.getElementById(e) : e;
+          if (n) {
+            const i = n.querySelector(".t-message__content") || n.querySelector(".t-message span");
+            i && (i.textContent = "上传中 " + Math.round(t) + "%");
+          }
+        }
+      }, 300);
+    }, window.showMultiButtonMessageBox = function() {
+      TMessageBox.confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        type: "warning",
+        showCancelButton: !0,
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        cancelButtonClass: "t-button--default"
+      }).then(() => {
+        TMessageBox.alert("你选择了删除", "提示");
+      }).catch(() => {
+        TMessage.info("已取消删除");
+      });
+    }, window.showCustomButtonMessageBox = function() {
+      TMessageBox.confirm("请选择操作", "提示", {
+        showCancelButton: !0,
+        confirmButtonText: "操作一",
+        cancelButtonText: "操作二",
+        buttonLayout: "custom"
+      }).then(() => {
+        TMessage.success("你选择了操作一");
+      }).catch(() => {
+        TMessage.info("你选择了操作二");
+      });
+    }, window.showAsyncMessageBox = function() {
+      TMessageBox.alert("2秒后自动关闭", "提示", {
+        showClose: !0,
+        beforeClose: (e, t, s) => {
+          e === "close" ? setTimeout(() => {
+            s();
+          }, 2e3) : s();
+        }
+      });
+    }, window.showLoadingMessageBox = function() {
+      TMessageBox.confirm("正在提交...", "提示", {
+        showCancelButton: !0,
+        confirmButtonText: "提交中...",
+        loading: !0,
+        beforeClose: (e, t, s) => {
+          e === "confirm" ? setTimeout(() => {
+            s(), TMessage.success("提交成功");
+          }, 2e3) : s();
+        }
+      });
+    }, window.openDialog = function(e) {
+      const t = document.getElementById(e);
+      t && (t.style.display = "flex", document.body.style.overflow = "hidden", setTimeout(() => {
+        t.classList.add("active");
+        const s = t.querySelector(".t-dialog--draggable");
+        s && B.initDraggable(s);
+      }, 10));
+    }, window.closeDialog = function(e) {
+      const t = document.getElementById(e);
+      t && (t.classList.remove("active"), setTimeout(() => {
+        t.style.display = "none", document.body.style.overflow = "";
+      }, 300));
+    }, window.openDrawer = function(e) {
+      q.open(e);
+    }, window.closeDrawer = function(e) {
+      q.close(e);
+    }, window.openDrawerWithSize = function(e, t) {
+      q.open(e, { size: t });
+    }, window.openDrawerWithFooter = function() {
+      q.open("right", {
+        title: "带页脚的抽屉",
+        content: "<p>这是抽屉的内容区域</p>",
+        showFooter: !0,
+        footer: `<button class="t-button" onclick="closeDrawer('right')">取消</button> <button class="t-button t-button--primary" onclick="TMessage.success('点击确认'); closeDrawer('right')">确认</button>`
+      });
+    }, window.openDrawerWithForm = function() {
+      q.open("right", {
+        title: "表单抽屉",
+        size: "400px",
+        content: `
+                <div class="t-form" style="max-width: 300px;">
+                    <div class="t-form__item">
+                        <label class="t-form__label">姓名</label>
+                        <input type="text" class="t-input t-p-5" placeholder="请输入姓名">
+                    </div>
+                    <div class="t-form__item" style="margin-top: 16px;">
+                        <label class="t-form__label">邮箱</label>
+                        <input type="text" class="t-input t-p-5" placeholder="请输入邮箱">
+                    </div>
+                </div>
+            `,
+        showFooter: !0,
+        footer: `<button class="t-button" onclick="closeDrawer('right')">取消</button> <button class="t-button t-button--primary" onclick="TMessage.success('提交成功'); closeDrawer('right')">提交</button>`
+      });
+    }, window.showNotification = function(e) {
+      return TbeUI.Notification.show(e);
+    }, window.closeNotification = function(e) {
+      TbeUI.Notification.close(e);
+    }, window.closeAllNotifications = function() {
+      TbeUI.Notification.closeAll();
+    }, window.showNotificationWithAction = function() {
+      return TbeUI.Notification.showNotificationWithAction();
+    }, window.showGroupedNotifications = function() {
+      return TbeUI.Notification.showGroupedNotifications();
+    }, window.TMessageBox = {
+      alert: function(e, t, s) {
+        return L.alert(e, t, s);
+      },
+      confirm: function(e, t, s) {
+        return L.confirm(e, t, s);
+      },
+      prompt: function(e, t, s) {
+        return L.prompt(e, t, s);
+      },
+      success: function(e, t) {
+        return L.success(e, t);
+      },
+      warning: function(e, t) {
+        return L.warning(e, t);
+      },
+      error: function(e, t) {
+        return L.error(e, t);
+      },
+      info: function(e, t) {
+        return L.info(e, t);
+      },
+      close: function() {
+        return L.close();
+      }
+    }, window.TMessage = {
+      success: function(e, t) {
+        return TbeUI.Message.show({ type: "success", message: e, duration: t });
+      },
+      warning: function(e, t) {
+        return TbeUI.Message.show({ type: "warning", message: e, duration: t });
+      },
+      error: function(e, t) {
+        return TbeUI.Message.show({ type: "error", message: e, duration: t });
+      },
+      info: function(e, t) {
+        return TbeUI.Message.show({ type: "info", message: e, duration: t });
+      },
+      loading: function(e, t) {
+        return TbeUI.Message.show({ type: "loading", message: e, duration: 0 });
+      },
+      closeAll: function() {
+        return TbeUI.Message.closeAll();
+      }
+    }, window.TLoading = ne, window.uploadStates = window.uploadStates || {}, window.formatFileSize = function(e) {
+      if (e === 0)
+        return "0 B";
+      const t = 1024, s = ["B", "KB", "MB", "GB"], n = Math.floor(Math.log(e) / Math.log(t));
+      return parseFloat((e / Math.pow(t, n)).toFixed(2)) + " " + s[n];
+    }, window.handleFileSelect = function(e, t) {
+      window.uploadStates[e] || (window.uploadStates[e] = { files: [] });
+      const s = window.uploadStates[e], i = document.getElementById(e).querySelector(".t-upload__file-list");
+      Array.from(t).forEach((a) => {
+        const l = {
+          id: "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9),
+          file: a,
+          name: a.name,
+          size: a.size,
+          status: "ready",
+          progress: 0
+        };
+        s.files.push(l), window.addFileToList(i, l, e);
+      });
+    }, window.addFileToList = function(e, t, s) {
+      const n = document.createElement("li");
+      n.className = "t-upload__file-item t-border-box--inset-sm", n.dataset.fileId = t.id;
+      const i = window.formatFileSize(t.size);
+      n.innerHTML = `
+            <span class="t-upload__file-name">${t.name}</span>
+            <span class="t-upload__file-size">${i}</span>
+            <span class="t-upload__file-status">待上传</span>
+            <div class="t-upload__file-progress" style="display: none;">
+                <div class="t-upload__file-progress-bar" style="width: 0%"></div>
+            </div>
+            <button class="t-upload__file-remove" onclick="window.removeFile('${s}', '${t.id}')">
+                <i class="t-icon-close"></i>
+            </button>
+        `, e.appendChild(n);
+    }, window.removeFile = function(e, t) {
+      const s = window.uploadStates[e];
+      if (!s)
+        return;
+      const n = s.files.findIndex((o) => o.id === t);
+      n > -1 && s.files.splice(n, 1);
+      const a = document.getElementById(e).querySelector(`[data-file-id="${t}"]`);
+      a && a.remove();
+    }, window.handleDragOver = function(e) {
+      e.preventDefault(), e.currentTarget.classList.add("is-dragover");
+    }, window.handleDragLeave = function(e) {
+      e.preventDefault(), e.currentTarget.classList.remove("is-dragover");
+    }, window.handleDrop = function(e, t) {
+      e.preventDefault(), e.currentTarget.classList.remove("is-dragover");
+      const s = e.dataTransfer.files;
+      s.length > 0 && window.handleFileSelect(t, s);
+    }, window.handleImageSelect = function(e, t) {
+      window.uploadStates[e] || (window.uploadStates[e] = { files: [] });
+      const s = window.uploadStates[e], n = document.getElementById(e + "-picture-list");
+      Array.from(t).forEach((i) => {
+        if (!i.type.startsWith("image/"))
+          return;
+        const a = "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9), o = {
+          id: a,
+          file: i,
+          name: i.name,
+          size: i.size,
+          status: "ready",
+          progress: 0
+        };
+        s.files.push(o);
+        const l = new FileReader();
+        l.onload = function(c) {
+          const d = document.createElement("div");
+          d.className = "t-upload__picture-item", d.dataset.fileId = a, d.innerHTML = `
+                    <img src="${c.target.result}" alt="${i.name}">
+                    <div class="t-upload__picture-mask">
+                        <span class="t-upload__picture-status">待上传</span>
+                        <div class="t-upload__picture-progress">
+                            <div class="t-upload__picture-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button class="t-upload__picture-remove" onclick="window.removeImage('${e}', '${a}')">
+                        <i class="t-icon-close"></i>
+                    </button>
+                `, n.appendChild(d);
+        }, l.readAsDataURL(i);
+      });
+    }, window.removeImage = function(e, t) {
+      const s = window.uploadStates[e];
+      if (!s)
+        return;
+      const n = s.files.findIndex((o) => o.id === t);
+      n > -1 && s.files.splice(n, 1);
+      const a = document.getElementById(e + "-picture-list").querySelector(`[data-file-id="${t}"]`);
+      a && a.remove();
+    }, window.simulateUpload = function(e) {
+      const t = window.uploadStates[e];
+      if (!t || t.files.length === 0) {
+        alert("请先选择文件");
+        return;
+      }
+      t.files.forEach((s) => {
+        if (s.status !== "ready")
+          return;
+        s.status = "uploading", window.updateImageStatus(e, s.id, "uploading");
+        let n = 0;
+        const i = setInterval(() => {
+          n += Math.random() * 20, n >= 100 ? (n = 100, clearInterval(i), s.status = "success", window.updateImageStatus(e, s.id, "success")) : window.updateImageProgress(e, s.id, n);
+        }, 200);
+      });
+    }, window.updateImageStatus = function(e, t, s) {
+      const i = document.getElementById(e + "-picture-list").querySelector(`[data-file-id="${t}"]`);
+      if (!i)
+        return;
+      const a = i.querySelector(".t-upload__picture-status"), o = {
+        ready: "待上传",
+        uploading: "上传中",
+        success: "上传成功",
+        error: "上传失败"
+      };
+      a && (a.textContent = o[s] || s, a.className = "t-upload__picture-status is-" + s);
+    }, window.updateImageProgress = function(e, t, s) {
+      const i = document.getElementById(e + "-picture-list").querySelector(`[data-file-id="${t}"]`);
+      if (!i)
+        return;
+      const a = i.querySelector(".t-upload__picture-progress-bar");
+      a && (a.style.width = s + "%");
+    }, window.handleAvatarSelect = function(e, t) {
+      if (!t || !t.type.startsWith("image/")) {
+        alert("请选择图片文件");
+        return;
+      }
+      const s = new FileReader();
+      s.onload = function(n) {
+        const i = document.getElementById(e + "-preview");
+        i.src = n.target.result, window.showMessage && window.showMessage({
+          type: "success",
+          message: "头像更换成功",
+          duration: 2e3
+        });
+      }, s.readAsDataURL(t);
+    }, window.handleFileSelectWithPreview = function(e, t) {
+      window.uploadStates[e] || (window.uploadStates[e] = { files: [] });
+      const s = window.uploadStates[e], n = document.getElementById(e + "-list");
+      Array.from(t).forEach((i) => {
+        const a = "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9), o = {
+          id: a,
+          file: i,
+          name: i.name,
+          size: i.size,
+          status: "ready",
+          progress: 0
+        };
+        s.files.push(o);
+        const l = document.createElement("li");
+        l.className = "t-upload__file-item t-border-box--inset-sm", l.dataset.fileId = a, l.innerHTML = `
+                <span class="t-upload__file-name">${i.name}</span>
+                <span class="t-upload__file-size">${window.formatFileSize(i.size)}</span>
+                <span class="t-upload__file-status">待上传</span>
+                <div class="t-upload__file-progress">
+                    <div class="t-upload__file-progress-bar" style="width: 0%"></div>
+                </div>
+                <button class="t-upload__file-remove" onclick="window.removeFileItem('${e}', '${a}')">
+                    <i class="t-icon-close"></i>
+                </button>
+            `, n.appendChild(l);
+      });
+    }, window.removeFileItem = function(e, t) {
+      const s = window.uploadStates[e];
+      if (!s)
+        return;
+      const n = s.files.findIndex((o) => o.id === t);
+      n > -1 && s.files.splice(n, 1);
+      const a = document.getElementById(e + "-list").querySelector(`[data-file-id="${t}"]`);
+      a && a.remove();
+    }, window.simulateUploadWithProgress = function(e) {
+      const t = window.uploadStates[e];
+      if (!t || t.files.length === 0) {
+        window.showMessage && window.showMessage({
+          type: "warning",
+          message: "请先选择文件",
+          duration: 2e3
+        });
+        return;
+      }
+      let s = 0;
+      t.files.forEach((n) => {
+        if (n.status !== "ready") {
+          s++;
+          return;
+        }
+        n.status = "uploading", window.updateFileItemStatus(e, n.id, "uploading");
+        let i = 0;
+        const a = setInterval(() => {
+          if (i += Math.random() * 15, i >= 100) {
+            if (i = 100, clearInterval(a), n.status = Math.random() > 0.1 ? "success" : "error", window.updateFileItemStatus(e, n.id, n.status), window.updateFileItemProgress(e, n.id, 100), s++, s >= t.files.length) {
+              const o = t.files.filter((l) => l.status === "success").length;
+              window.showMessage && window.showMessage({
+                type: o > 0 ? "success" : "error",
+                message: `上传完成：${o}/${t.files.length} 个文件上传成功`,
+                duration: 3e3
+              });
+            }
+          } else
+            window.updateFileItemProgress(e, n.id, i);
+        }, 300);
+      });
+    }, window.updateFileItemStatus = function(e, t, s) {
+      const i = document.getElementById(e + "-list").querySelector(`[data-file-id="${t}"]`);
+      if (!i)
+        return;
+      const a = i.querySelector(".t-upload__file-status"), o = {
+        ready: "待上传",
+        uploading: "上传中",
+        success: "上传成功",
+        error: "上传失败"
+      };
+      a && (a.textContent = o[s] || s, a.className = "t-upload__file-status is-" + s);
+    }, window.updateFileItemProgress = function(e, t, s) {
+      const i = document.getElementById(e + "-list").querySelector(`[data-file-id="${t}"]`);
+      if (!i)
+        return;
+      const a = i.querySelector(".t-upload__file-progress-bar");
+      a && (a.style.width = s + "%");
+    }, window.clearUpload = function(e) {
+      window.uploadStates[e] = { files: [] };
+      const t = document.getElementById(e + "-list");
+      t && (t.innerHTML = "");
+    }, window.handleMultiFileSelect = function(e, t) {
+      window.uploadStates[e] || (window.uploadStates[e] = { files: [] });
+      const s = window.uploadStates[e], n = document.getElementById(e + "-table"), i = n.querySelector("tbody"), a = document.getElementById(e + "-empty");
+      n.style.display = "block", a.style.display = "none", Array.from(t).forEach((o) => {
+        const l = "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9), c = {
+          id: l,
+          file: o,
+          name: o.name,
+          size: o.size,
+          status: "ready"
+        };
+        s.files.push(c);
+        const d = document.createElement("tr");
+        d.dataset.fileId = l, d.innerHTML = `
+                <td>${o.name}</td>
+                <td>${window.formatFileSize(o.size)}</td>
+                <td><span class="t-tag">待上传</span></td>
+                <td>
+                    <button class="t-btn t-btn--text" onclick="window.removeTableFile('${e}', '${l}')">
+                        <i class="t-icon-delete"></i> 删除
+                    </button>
+                </td>
+            `, i.appendChild(d);
+      });
+    }, window.removeTableFile = function(e, t) {
+      const s = window.uploadStates[e];
+      if (!s)
+        return;
+      const n = s.files.findIndex((l) => l.id === t);
+      n > -1 && s.files.splice(n, 1);
+      const i = document.getElementById(e + "-table"), o = i.querySelector("tbody").querySelector(`[data-file-id="${t}"]`);
+      o && o.remove(), s.files.length === 0 && (i.style.display = "none", document.getElementById(e + "-empty").style.display = "block");
+    }, window.transferToTarget = function(e) {
+      const t = document.getElementById(e + "-source-list"), s = document.getElementById(e + "-target-list");
+      if (!t || !s)
+        return;
+      t.querySelectorAll('input[type="checkbox"]:checked').forEach((i) => {
+        const a = i.closest(".t-transfer-item");
+        i.checked = !1, s.appendChild(a);
+      }), window.updateTransferSelection(e);
+    }, window.transferToSource = function(e) {
+      const t = document.getElementById(e + "-source-list"), s = document.getElementById(e + "-target-list");
+      if (!t || !s)
+        return;
+      s.querySelectorAll('input[type="checkbox"]:checked').forEach((i) => {
+        const a = i.closest(".t-transfer-item");
+        i.checked = !1, t.appendChild(a);
+      }), window.updateTransferSelection(e);
+    }, window.toggleTransferAll = function(e, t) {
+      const s = document.getElementById(e + "-" + t + "-all"), n = document.getElementById(e + "-" + t + "-list");
+      if (!s || !n)
+        return;
+      n.querySelectorAll('.t-transfer-item:not([style*="display: none"]) input[type="checkbox"]').forEach((a) => {
+        a.checked = s.checked;
+      }), window.updateTransferSelection(e);
+    }, window.filterTransfer = function(e, t, s) {
+      const n = document.getElementById(e + "-" + t + "-list");
+      if (!n)
+        return;
+      n.querySelectorAll(".t-transfer-item").forEach((a) => {
+        const o = a.querySelector(".t-transfer-item-label");
+        if (!o)
+          return;
+        const l = o.textContent.toLowerCase(), c = a.getAttribute("data-label") || "";
+        l.includes(s.toLowerCase()) || c.toLowerCase().includes(s.toLowerCase()) ? a.style.display = "" : a.style.display = "none";
+      }), window.updateTransferSelection(e);
+    }, window.updateTransferSelection = function(e) {
+      const t = document.getElementById(e + "-source-list"), s = document.getElementById(e + "-target-list");
+      if (!t || !s)
+        return;
+      const n = t.querySelectorAll('input[type="checkbox"]:checked'), i = s.querySelectorAll('input[type="checkbox"]:checked'), a = document.getElementById(e + "-source-count"), o = document.getElementById(e + "-target-count"), l = document.getElementById(e + "-source-all"), c = document.getElementById(e + "-target-all"), d = document.getElementById(e + "-to-target"), m = document.getElementById(e + "-to-source");
+      if (a) {
+        const r = t.querySelectorAll('.t-transfer-item:not([style*="display: none"])');
+        a.textContent = n.length + "/" + r.length;
+      }
+      if (o) {
+        const r = s.querySelectorAll('.t-transfer-item:not([style*="display: none"])');
+        o.textContent = i.length + "/" + r.length;
+      }
+      if (l) {
+        const r = t.querySelectorAll('.t-transfer-item:not([style*="display: none"])'), h = t.querySelectorAll('.t-transfer-item:not([style*="display: none"]) input[type="checkbox"]:checked');
+        l.checked = r.length > 0 && h.length === r.length;
+      }
+      if (c) {
+        const r = s.querySelectorAll('.t-transfer-item:not([style*="display: none"])'), h = s.querySelectorAll('.t-transfer-item:not([style*="display: none"]) input[type="checkbox"]:checked');
+        c.checked = r.length > 0 && h.length === r.length;
+      }
+      d && (d.disabled = n.length === 0), m && (m.disabled = i.length === 0);
+    }, window.toggleTooltip = function(e) {
+      const t = document.getElementById(e);
+      t && t.classList.toggle("is-active");
+    }, window.showTooltip = function(e) {
+      const t = document.getElementById(e);
+      t && t.classList.add("is-active");
+    }, window.hideTooltip = function(e) {
+      const t = document.getElementById(e);
+      t && t.classList.remove("is-active");
+    };
+    let b = null, T = null;
+    window.showFullscreenLoading = function() {
+      let e = document.getElementById("fullscreenLoading");
+      e || (e = document.createElement("div"), e.id = "fullscreenLoading", e.className = "t-loading-fullscreen", e.innerHTML = `
+                <div class="t-loading-content">
+                    <div class="t-loading-spinner"></div>
+                    <p class="t-loading-text">加载中...</p>
+                </div>
+            `, document.body.appendChild(e)), e.classList.add("active"), document.body.style.overflow = "hidden", b && clearTimeout(b), b = setTimeout(() => {
+        window.hideFullscreenLoading();
+      }, 3e3);
+    }, window.hideFullscreenLoading = function() {
+      const e = document.getElementById("fullscreenLoading");
+      e && (e.classList.remove("active"), document.body.style.overflow = ""), b && (clearTimeout(b), b = null), T && (clearInterval(T), T = null);
+    }, window.toggleAreaLoading = function() {
+      const e = document.getElementById("areaLoading");
+      e && e.classList.toggle("active");
+    }, window.showLoadingWithType = function(e) {
+      let t = document.getElementById("fullscreenLoading");
+      t || (t = document.createElement("div"), t.id = "fullscreenLoading", t.className = "t-loading-fullscreen", document.body.appendChild(t));
+      const s = {
+        spinner: "t-loading-spinner",
+        ring: "t-loading-ring",
+        wave: "t-loading-wave",
+        dots: "t-loading-dots",
+        square: "t-loading-square",
+        gradient: "t-loading-gradient"
+      };
+      let n = "";
+      e === "wave" ? n = '<div class="t-loading-wave"><span></span><span></span><span></span><span></span><span></span></div>' : e === "dots" ? n = '<div class="t-loading-dots"><span></span><span></span><span></span></div>' : n = '<div class="' + (s[e] || "t-loading-spinner") + '"></div>', t.innerHTML = `
+            <div class="t-loading-content">
+                ${n}
+                <p class="t-loading-text">加载中...</p>
+            </div>
+        `, t.classList.add("active"), document.body.style.overflow = "hidden", b && clearTimeout(b), b = setTimeout(() => {
+        window.hideFullscreenLoading();
+      }, 3e3);
+    }, window.showLoadingWithProgress = function() {
+      let e = document.getElementById("fullscreenLoading");
+      e || (e = document.createElement("div"), e.id = "fullscreenLoading", e.className = "t-loading-fullscreen", document.body.appendChild(e)), e.innerHTML = `
+            <div class="t-loading-content">
+                <div class="t-loading-container">
+                    <div class="t-loading-percent" id="loadingPercent">0%</div>
+                    <div class="t-loading-progress">
+                        <div class="t-loading-progress-bar" id="loadingProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <p class="t-loading-text">正在加载...</p>
+            </div>
+        `, e.classList.add("active"), document.body.style.overflow = "hidden";
+      let t = 0;
+      T && clearInterval(T), T = setInterval(() => {
+        t += Math.random() * 15, t >= 100 && (t = 100, clearInterval(T), T = null, setTimeout(() => {
+          window.hideFullscreenLoading(), window.TMessage && window.TMessage.success("加载完成！");
+        }, 500));
+        const s = document.getElementById("loadingProgressBar"), n = document.getElementById("loadingPercent");
+        s && (s.style.width = t + "%"), n && (n.textContent = Math.round(t) + "%");
+      }, 200);
+    }, window.showCustomLoading = function() {
+      let e = document.getElementById("fullscreenLoading");
+      e || (e = document.createElement("div"), e.id = "fullscreenLoading", e.className = "t-loading-fullscreen", document.body.appendChild(e)), e.innerHTML = `
+            <div class="t-loading-content">
+                <div class="t-loading-spinner"></div>
+                <p class="t-loading-text">自定义加载中...</p>
+            </div>
+        `, e.classList.add("active"), document.body.style.overflow = "hidden", b && clearTimeout(b), b = setTimeout(() => {
+        window.hideFullscreenLoading();
+      }, 3e3);
+    }, window.showLoadingWithIcon = function() {
+      let e = document.getElementById("fullscreenLoading");
+      e || (e = document.createElement("div"), e.id = "fullscreenLoading", e.className = "t-loading-fullscreen", document.body.appendChild(e)), e.innerHTML = `
+            <div class="t-loading-content">
+                <div class="t-loading-custom">
+                    <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 6v6l4 2"></path>
+                    </svg>
+                </div>
+                <p class="t-loading-text">图标加载...</p>
+            </div>
+        `, e.classList.add("active"), document.body.style.overflow = "hidden", b && clearTimeout(b), b = setTimeout(() => {
+        window.hideFullscreenLoading();
+      }, 3e3);
+    }, window.showLoadingWithPercent = function() {
+      window.showLoadingWithProgress();
+    }, window.loadingServiceDemo = function() {
+      if (window.TLoading) {
+        const e = window.TLoading.service({
+          text: "服务方式加载中...",
+          spinner: "ring",
+          lock: !0
+        });
+        setTimeout(() => {
+          e.close();
+        }, 3e3);
+      }
+    }, window.loadingServiceWithTarget = function() {
+      if (window.TLoading) {
+        const e = document.getElementById("areaLoading");
+        e && (e.classList.add("active"), setTimeout(() => {
+          e.classList.remove("active");
+        }, 3e3));
+      }
+    };
+    const E = {}, I = {};
+    function Q(e) {
+      const t = document.getElementById(e);
+      if (!t)
+        return;
+      const s = t.closest(".t-carousel"), n = t.querySelectorAll(".t-carousel-item"), i = s ? s.querySelectorAll(".t-carousel-indicator") : [], a = s && s.classList.contains("t-carousel--fade"), o = s && s.classList.contains("t-carousel-multi"), l = s && s.classList.contains("t-carousel-3d"), c = s && s.classList.contains("t-carousel-vertical"), d = s && s.classList.contains("t-carousel-card");
+      E[e] = {
+        current: 0,
+        total: n.length,
+        container: t,
+        items: n,
+        indicators: i,
+        carouselEl: s,
+        isFade: a,
+        isMulti: o,
+        is3D: l,
+        isVertical: c,
+        isCard: d,
+        autoplay: !1
+      }, Z(e), s && s.classList.contains("t-carousel--autoplay") && startAutoplay(e);
+    }
+    function Z(e) {
+      const t = E[e];
+      if (!t)
+        return;
+      const { current: s, total: n, container: i, items: a, indicators: o, isFade: l, isMulti: c, is3D: d, isVertical: m, isCard: r } = t;
+      if (l)
+        a.forEach((h, f) => {
+          h.classList.toggle("active", f === s);
+        });
+      else if (c) {
+        const f = n - 4, u = Math.min(s, f), g = -u * (100 / 4);
+        i.style.transform = `translateX(${g}%)`, a.forEach((p, v) => {
+          const w = v >= u && v < u + 4;
+          p.style.opacity = w ? "1" : "0.5";
+        });
+      } else if (d) {
+        a.forEach((f, u) => {
+          f.classList.toggle("active", u === s);
+        });
+        const h = -(s - 1) * 40;
+        i.style.transform = `translateX(${h}%)`;
+      } else if (m) {
+        const h = -s * 100;
+        i.style.transform = `translateY(${h}%)`, a.forEach((f, u) => {
+          f.classList.toggle("active", u === s);
+        });
+      } else {
+        const h = -s * 100;
+        i.style.transform = `translateX(${h}%)`, r && a.forEach((f, u) => {
+          f.classList.toggle("active", u === s);
+        });
+      }
+      o.length > 0 && o.forEach((h, f) => {
+        h.classList.toggle("active", f === s);
+      });
+    }
+    window.nextSlide = function(e) {
+      E[e] || Q(e);
+      const t = E[e];
+      if (!t)
+        return;
+      const { total: s, isMulti: n } = t;
+      if (n) {
+        const a = s - 4;
+        t.current = t.current >= a ? 0 : t.current + 1;
+      } else
+        t.current = (t.current + 1) % s;
+      Z(e);
+    }, window.prevSlide = function(e) {
+      E[e] || Q(e);
+      const t = E[e];
+      if (!t)
+        return;
+      const { total: s, isMulti: n } = t;
+      if (n) {
+        const a = s - 4;
+        t.current = t.current <= 0 ? a : t.current - 1;
+      } else
+        t.current = (t.current - 1 + s) % s;
+      Z(e);
+    }, window.goToSlide = function(e, t) {
+      E[e] || Q(e);
+      const s = E[e];
+      s && (s.current = t, Z(e));
+    }, window.startAutoplay = function(e) {
+      I[e] && clearInterval(I[e]), I[e] = setInterval(() => {
+        window.nextSlide(e);
+      }, 3e3), E[e] && (E[e].autoplay = !0);
+    }, window.stopAutoplay = function(e) {
+      I[e] && (clearInterval(I[e]), I[e] = null), E[e] && (E[e].autoplay = !1);
+    }, window.toggleAutoplay = function(e) {
+      E[e] || Q(e);
+      const t = E[e];
+      t && (t.autoplay ? window.stopAutoplay(e) : window.startAutoplay(e));
+    };
+    const N = [
+      "/demo-img/129-800x600.jpg",
+      "/demo-img/152-800x600.jpg",
+      "/demo-img/175-800x600.jpg",
+      "/demo-img/10-800x600.jpg"
+    ];
+    let M = 0;
+    return window.previewImage = function(e) {
+      let t = document.getElementById("t-image-preview-overlay");
+      t || (t = document.createElement("div"), t.id = "t-image-preview-overlay", t.className = "t-image-preview-overlay", t.innerHTML = `
+                <div class="t-image-preview-wrapper" onclick="event.stopPropagation()">
+                    <img src="" alt="预览" class="t-image-preview-img">
+                    <button class="t-image-preview-close" onclick="event.stopPropagation(); closeImagePreview()">×</button>
+                    <button class="t-image-preview-prev" onclick="event.stopPropagation(); previewPrevImage()">‹</button>
+                    <button class="t-image-preview-next" onclick="event.stopPropagation(); previewNextImage()">›</button>
+                </div>
+            `, document.body.appendChild(t), t.addEventListener("click", function(n) {
+        n.target === t && closeImagePreview();
+      }), document.addEventListener("keydown", function(n) {
+        n.key === "Escape" && closeImagePreview();
+      }));
+      const s = t.querySelector(".t-image-preview-img");
+      s.src = e, t.classList.add("active"), document.body.style.overflow = "hidden";
+    }, window.previewImageGroup = function(e) {
+      M = e, window.previewImage(N[e]);
+    }, window.previewPrevImage = function() {
+      M = (M - 1 + N.length) % N.length;
+      const e = document.querySelector(".t-image-preview-img");
+      e && (e.src = N[M]);
+    }, window.previewNextImage = function() {
+      M = (M + 1) % N.length;
+      const e = document.querySelector(".t-image-preview-img");
+      e && (e.src = N[M]);
+    }, window.closeImagePreview = function() {
+      const e = document.getElementById("t-image-preview-overlay");
+      e && (e.classList.remove("active"), document.body.style.overflow = "");
+    }, window.hidePlaceholder = function(e, t) {
+      const s = document.getElementById(e);
+      s && (s.style.display = "none"), t.style.display = "block";
+    }, window.showImageError = function(e) {
+      e.style.display = "none";
+      const s = e.parentElement.querySelector(".t-image__error");
+      s && (s.style.display = "flex");
+    }, window.toggleTPopover = function(e) {
+      const t = document.getElementById(e);
+      t && (t.classList.contains("is-disabled") || (t.classList.toggle("active"), t.classList.contains("active") && setTimeout(() => {
+        document.addEventListener("click", function s(n) {
+          t.contains(n.target) || (t.classList.remove("active"), document.removeEventListener("click", s));
+        });
+      }, 0)));
+    }, window.closeTPopover = function(e) {
+      const t = document.getElementById(e);
+      t && t.classList.remove("active");
+    }, window.openTPopover = function(e) {
+      const t = document.getElementById(e);
+      t && !t.classList.contains("is-disabled") && t.classList.add("active");
+    }, window.toggleSelectAll = function() {
+      const e = document.getElementById("selectAll");
+      if (!e)
+        return;
+      document.querySelectorAll(".row-checkbox").forEach((s) => {
+        s.checked = e.checked;
+      });
+    }, window.uploadStates = {}, window.handleFileSelect = function(e, t) {
+      window.uploadStates[e] || (window.uploadStates[e] = { files: [] });
+      const s = window.uploadStates[e], i = document.getElementById(e).querySelector(".t-upload__file-list");
+      Array.from(t).forEach((a) => {
+        const l = {
+          id: "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9),
+          file: a,
+          name: a.name,
+          size: a.size,
+          status: "ready",
+          progress: 0
+        };
+        s.files.push(l), window.addFileToList(i, l, e);
+      });
+    }, window.addFileToList = function(e, t, s) {
+      const n = document.createElement("li");
+      n.className = "t-upload__file-item t-border-box--inset-sm", n.dataset.fileId = t.id;
+      const i = window.formatFileSize(t.size);
+      n.innerHTML = `
+            <span class="t-upload__file-name">${t.name}</span>
+            <span class="t-upload__file-size">${i}</span>
+            <span class="t-upload__file-status">待上传</span>
+            <div class="t-upload__file-progress" style="display: none;">
+                <div class="t-upload__file-progress-bar" style="width: 0%"></div>
+            </div>
+            <button class="t-upload__file-remove" onclick="removeFile('${s}', '${t.id}')">
+                <i class="t-icon-close"></i>
+            </button>
+        `, e.appendChild(n);
+    }, window.formatFileSize = function(e) {
+      if (e === 0)
+        return "0 B";
+      const t = 1024, s = ["B", "KB", "MB", "GB"], n = Math.floor(Math.log(e) / Math.log(t));
+      return parseFloat((e / Math.pow(t, n)).toFixed(2)) + " " + s[n];
+    }, window.removeFile = function(e, t) {
+      const s = window.uploadStates[e];
+      if (!s)
+        return;
+      const n = s.files.findIndex((o) => o.id === t);
+      n > -1 && s.files.splice(n, 1);
+      const a = document.getElementById(e).querySelector(`[data-file-id="${t}"]`);
+      a && a.remove();
+    }, window.handleDragOver = function(e) {
+      e.preventDefault(), e.currentTarget.classList.add("is-dragover");
+    }, window.handleDragLeave = function(e) {
+      e.preventDefault(), e.currentTarget.classList.remove("is-dragover");
+    }, window.handleDrop = function(e, t) {
+      e.preventDefault(), e.currentTarget.classList.remove("is-dragover");
+      const s = e.dataTransfer.files;
+      s.length > 0 && window.handleFileSelect(t, s);
+    }, window.handleImageSelect = function(e, t) {
+      window.uploadStates[e] || (window.uploadStates[e] = { files: [] });
+      const s = window.uploadStates[e], n = document.getElementById(e + "-picture-list");
+      Array.from(t).forEach((i) => {
+        if (!i.type.startsWith("image/"))
+          return;
+        const a = "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9), o = {
+          id: a,
+          file: i,
+          name: i.name,
+          size: i.size,
+          status: "ready",
+          progress: 0
+        };
+        s.files.push(o);
+        const l = new FileReader();
+        l.onload = function(c) {
+          const d = document.createElement("div");
+          d.className = "t-upload__picture-item", d.dataset.fileId = a, d.innerHTML = `
+                    <img src="${c.target.result}" alt="${i.name}">
+                    <div class="t-upload__picture-mask">
+                        <span class="t-upload__picture-status">待上传</span>
+                        <div class="t-upload__picture-progress">
+                            <div class="t-upload__picture-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button class="t-upload__picture-remove" onclick="removeImage('${e}', '${a}')">
+                        <i class="t-icon-close"></i>
+                    </button>
+                `, n.appendChild(d);
+        }, l.readAsDataURL(i);
+      });
+    }, window.removeImage = function(e, t) {
+      const s = window.uploadStates[e];
+      if (!s)
+        return;
+      const n = s.files.findIndex((o) => o.id === t);
+      n > -1 && s.files.splice(n, 1);
+      const a = document.getElementById(e + "-picture-list").querySelector(`[data-file-id="${t}"]`);
+      a && a.remove();
+    }, window.simulateUpload = function(e) {
+      const t = window.uploadStates[e];
+      if (!t || t.files.length === 0) {
+        alert("请先选择文件");
+        return;
+      }
+      t.files.forEach((s) => {
+        if (s.status !== "ready")
+          return;
+        s.status = "uploading", window.updateImageStatus(e, s.id, "uploading");
+        let n = 0;
+        const i = setInterval(() => {
+          n += Math.random() * 20, n >= 100 ? (n = 100, clearInterval(i), s.status = "success", window.updateImageStatus(e, s.id, "success")) : window.updateImageProgress(e, s.id, n);
+        }, 200);
+      });
+    }, window.updateImageStatus = function(e, t, s) {
+      const i = document.getElementById(e + "-picture-list").querySelector(`[data-file-id="${t}"]`);
+      if (!i)
+        return;
+      const a = i.querySelector(".t-upload__picture-status"), o = {
+        ready: "待上传",
+        uploading: "上传中",
+        success: "上传成功",
+        error: "上传失败"
+      };
+      a && (a.textContent = o[s] || s, a.className = "t-upload__picture-status is-" + s);
+    }, window.updateImageProgress = function(e, t, s) {
+      const i = document.getElementById(e + "-picture-list").querySelector(`[data-file-id="${t}"]`);
+      if (!i)
+        return;
+      const a = i.querySelector(".t-upload__picture-progress-bar");
+      a && (a.style.width = s + "%");
+    }, window.handleAvatarSelect = function(e, t) {
+      if (!t || !t.type.startsWith("image/")) {
+        alert("请选择图片文件");
+        return;
+      }
+      const s = new FileReader();
+      s.onload = function(n) {
+        const i = document.getElementById(e + "-preview");
+        i.src = n.target.result, window.showMessage && window.showMessage({
+          type: "success",
+          message: "头像更换成功",
+          duration: 2e3
+        });
+      }, s.readAsDataURL(t);
+    }, window.handleFileSelectWithPreview = function(e, t) {
+      window.uploadStates[e] || (window.uploadStates[e] = { files: [] });
+      const s = window.uploadStates[e], n = document.getElementById(e + "-list");
+      Array.from(t).forEach((i) => {
+        const a = "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9), o = {
+          id: a,
+          file: i,
+          name: i.name,
+          size: i.size,
+          status: "ready",
+          progress: 0
+        };
+        s.files.push(o);
+        const l = document.createElement("li");
+        l.className = "t-upload__file-item t-border-box--inset-sm", l.dataset.fileId = a, l.innerHTML = `
+                <span class="t-upload__file-name">${i.name}</span>
+                <span class="t-upload__file-size">${window.formatFileSize(i.size)}</span>
+                <span class="t-upload__file-status">待上传</span>
+                <div class="t-upload__file-progress">
+                    <div class="t-upload__file-progress-bar" style="width: 0%"></div>
+                </div>
+                <button class="t-upload__file-remove" onclick="removeFileItem('${e}', '${a}')">
+                    <i class="t-icon-close"></i>
+                </button>
+            `, n.appendChild(l);
+      });
+    }, window.removeFileItem = function(e, t) {
+      const s = window.uploadStates[e];
+      if (!s)
+        return;
+      const n = s.files.findIndex((o) => o.id === t);
+      n > -1 && s.files.splice(n, 1);
+      const a = document.getElementById(e + "-list").querySelector(`[data-file-id="${t}"]`);
+      a && a.remove();
+    }, window.simulateUploadWithProgress = function(e) {
+      const t = window.uploadStates[e];
+      if (!t || t.files.length === 0) {
+        window.showMessage && window.showMessage({
+          type: "warning",
+          message: "请先选择文件",
+          duration: 2e3
+        });
+        return;
+      }
+      let s = 0;
+      t.files.forEach((n) => {
+        if (n.status !== "ready") {
+          s++;
+          return;
+        }
+        n.status = "uploading", window.updateFileItemStatus(e, n.id, "uploading");
+        let i = 0;
+        const a = setInterval(() => {
+          if (i += Math.random() * 15, i >= 100) {
+            if (i = 100, clearInterval(a), n.status = Math.random() > 0.1 ? "success" : "error", window.updateFileItemStatus(e, n.id, n.status), window.updateFileItemProgress(e, n.id, 100), s++, s >= t.files.length) {
+              const o = t.files.filter((l) => l.status === "success").length;
+              window.showMessage && window.showMessage({
+                type: o > 0 ? "success" : "error",
+                message: `上传完成：${o}/${t.files.length} 个文件上传成功`,
+                duration: 3e3
+              });
+            }
+          } else
+            window.updateFileItemProgress(e, n.id, i);
+        }, 300);
+      });
+    }, window.updateFileItemStatus = function(e, t, s) {
+      const i = document.getElementById(e + "-list").querySelector(`[data-file-id="${t}"]`);
+      if (!i)
+        return;
+      const a = i.querySelector(".t-upload__file-status"), o = {
+        ready: "待上传",
+        uploading: "上传中",
+        success: "上传成功",
+        error: "上传失败"
+      };
+      a && (a.textContent = o[s] || s, a.className = "t-upload__file-status is-" + s);
+    }, window.updateFileItemProgress = function(e, t, s) {
+      const i = document.getElementById(e + "-list").querySelector(`[data-file-id="${t}"]`);
+      if (!i)
+        return;
+      const a = i.querySelector(".t-upload__file-progress-bar");
+      a && (a.style.width = s + "%");
+    }, window.clearUpload = function(e) {
+      window.uploadStates[e] = { files: [] };
+      const t = document.getElementById(e + "-list");
+      t && (t.innerHTML = "");
+    }, window.handleMultiFileSelect = function(e, t) {
+      window.uploadStates[e] || (window.uploadStates[e] = { files: [] });
+      const s = window.uploadStates[e], n = document.getElementById(e + "-table"), i = n.querySelector("tbody"), a = document.getElementById(e + "-empty");
+      n.style.display = "block", a.style.display = "none", Array.from(t).forEach((o) => {
+        const l = "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9), c = {
+          id: l,
+          file: o,
+          name: o.name,
+          size: o.size,
+          status: "ready"
+        };
+        s.files.push(c);
+        const d = document.createElement("tr");
+        d.dataset.fileId = l, d.innerHTML = `
+                <td>${o.name}</td>
+                <td>${window.formatFileSize(o.size)}</td>
+                <td><span class="t-tag">待上传</span></td>
+                <td>
+                    <button class="t-btn t-btn--text" onclick="removeTableFile('${e}', '${l}')">
+                        <i class="t-icon-delete"></i> 删除
+                    </button>
+                </td>
+            `, i.appendChild(d);
+      });
+    }, window.removeTableFile = function(e, t) {
+      const s = window.uploadStates[e];
+      if (!s)
+        return;
+      const n = s.files.findIndex((l) => l.id === t);
+      n > -1 && s.files.splice(n, 1);
+      const i = document.getElementById(e + "-table"), o = i.querySelector("tbody").querySelector(`[data-file-id="${t}"]`);
+      o && o.remove(), s.files.length === 0 && (i.style.display = "none", document.getElementById(e + "-empty").style.display = "block");
+    }, window.toggleExpandRow = function(e) {
+      const t = e.closest("tr");
+      if (!t)
+        return;
+      const s = t.nextElementSibling;
+      if (s && s.classList.contains("t-table__expanded-row")) {
+        const n = s.style.display !== "none";
+        s.style.display = n ? "none" : "table-row", e.textContent = n ? "▶" : "▼", e.classList.toggle("expanded", !n);
+      }
+    }, window.toggleTreeRow = function(e) {
+      const t = e.closest("tr");
+      if (!t)
+        return;
+      const s = e.textContent === "▼";
+      e.textContent = s ? "▶" : "▼";
+      let n = t.nextElementSibling;
+      for (; n && n.classList.contains("t-table__tree-child"); )
+        n.style.display = s ? "none" : "table-row", n = n.nextElementSibling;
+    }, {
+      version: "1.1.0",
+      // 组件
+      Radio: ee,
+      Checkbox: U,
+      Input: H,
+      InputNumber: Y,
+      Select: V,
+      Dropdown: ce,
+      Dialog: B,
+      Tooltip: Ce,
+      Steps: xe,
+      Message: te,
+      Alert: ke,
+      Notification: Be,
+      MessageBox: L,
+      NavMenu: re,
+      Backtop: de,
+      Theme: ue,
+      Switch: se,
+      Slider: K,
+      Rate: W,
+      Loading: ne,
+      Collapse: X,
+      Countdown: Te,
+      ColorPicker: j,
+      Cascader: $,
+      TimePicker: _,
+      DatePicker: z,
+      DateTimePicker: x,
+      Upload: he,
+      Form: ie,
+      Transfer: me,
+      Popover: fe,
+      Tabs: ge,
+      Image: pe,
+      Carousel: ve,
+      Tag: P,
+      Avatar: ye,
+      Drawer: q,
+      Tree: A,
+      Pagination: G,
+      // 工具函数
+      utils: {
+        debounce: D,
+        throttle: S,
+        isInViewport: Se
+      },
+      // 初始化
+      init: J
+    };
+  });
+});
+export default $e();
+//# sourceMappingURL=tbeui.esm.js.map
