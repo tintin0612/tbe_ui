@@ -2,9 +2,9 @@
   "name": "tbe-ui",
   "version": "1.0.9",
   "description": "Tbe UI - 一套有温度的UI组件库，包含60+精美组件，硅胶质感设计",
-  "main": "dist/tbeui.cjs.js",
-  "module": "dist/tbeui.esm.js",
-  "style": "dist/tbeui.css",
+  "main": "dist/js/tbeui.js",
+  "module": "dist/js/tbeui.js",
+  "style": "dist/css/tbeui.css",
   "files": [
     "dist",
     "docs/src/adapters",
@@ -20,7 +20,9 @@
     "wechat.jpg"
   ],
   "scripts": {
-    "build": "npm run build:lib",
+    "build": "node scripts/build.js",
+    "build:css": "node scripts/build-css.js",
+    "build:js": "node scripts/build-js.js",
     "build:lib": "vite build",
     "build:docs": "vitepress build docs && node scripts/copy-docs-assets.js",
     "dev": "vite",
@@ -62,6 +64,7 @@
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "iconv-lite": "^0.7.2",
     "jsdom": "^29.0.1",
     "prettier": "^2.8.8",
     "stylelint": "^15.8.0",
